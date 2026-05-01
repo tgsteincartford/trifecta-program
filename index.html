@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Trifecta — 65-Week Training Program</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState } = React;
+
+// The Trifecta — 65-Week Training Program
+
+const phases = [
+  {
+    id: 1,
+    name: "PHASE I",
+    label: "Foundation",
+    weeks: "Weeks 1–10",
+    col: "#E8920A",
+    analogy: "Laying fence posts — every post matters, the fence follows.",
+    overview:
+      "Build the work capacity base before asking the body to peak. Strength volume is high, intensity moderate, conditioning grows from the ground up. This is the infrastructure phase — like stringing wire before the cattle ever see the fence. Without this, Phases II–IV fall apart.",
+    keyTargets: [
+      "Front Squat: 5×5 @285 → 4×3 @340",
+      "Deadlift: 4×4 @380 → 3×3 @440",
+      "Conditioning: aerobic base + HYROX skill introduction",
+      "Hypertrophy: high-volume accessory work across all days",
+    ],
+    nutrition:
+      "Lean Bulk: +250–300 kcal surplus. 1.1–1.2g protein/lb (~210g+/day). Target weight gain: +0.5–0.75 lbs/week. No dirty bulk — controlled surplus only.",
+    competition: null,
+    days: [
+      {
+        id: 1,
+        label: "UPPER PUSH",
+        sub: "Chest / Shoulders / Triceps",
+        exercises: [
+          { name: "Incline Barbell Bench ★★", protocol: "4×5 @ 78–82% | +2.5lbs/week", note: "Primary press strength driver. RPE 8. This sets the trajectory for meet bench." },
+          { name: "Flat DB Press", protocol: "4×10–12", note: "Hypertrophy. Increase load when all 4 sets reach top of rep range." },
+          { name: "Standing OHP", protocol: "3×8 @ 70% | +5lbs/2wks", note: "Overhead stability and delt mass." },
+          { name: "Cable Lateral Raise", protocol: "4×15–20 | 3-sec eccentric", note: "Shoulder health and width. Slow down the eccentric." },
+          { name: "Face Pull [NON-NEGOTIABLE]", protocol: "4×20 | light", note: "Every push session. Rotator cuff and rear delt health. This is insurance." },
+          { name: "Rope Pushdown", protocol: "3×15", note: "Superset with face pull." },
+          { name: "OH Tricep Extension (cable)", protocol: "3×12–15", note: "Long-head emphasis. Full stretch." },
+        ],
+      },
+      {
+        id: 2,
+        label: "LOWER — QUAD",
+        sub: "Front Squat Priority + Quad Volume",
+        exercises: [
+          { name: "FRONT SQUAT ★★★", protocol: "Wk1-2: 5×5@285 | Wk3-4: 5×5@295 | Wk5-6: 5×4@310 | Wk7-8: 4×4@325 | Wk9-10: 4×3@340", note: "PRIMARY GOAL LIFT. Film every session. Mandatory wrist/elbow warm-up. +5lbs every 2 weeks." },
+          { name: "Paused Front Squat", protocol: "3×3 @ 65% (~245) | 3-sec pause", note: "Pause in hole. Technique reinforcement only — not a heavy day." },
+          { name: "Leg Press", protocol: "4×12–15", note: "Heels close, quad emphasis. Full ROM." },
+          { name: "Bulgarian Split Squat", protocol: "3×10/leg | BW or light KB", note: "Single-leg stability base. Perfect form before adding load." },
+          { name: "Leg Extension", protocol: "4×15–20 | slow eccentric", note: "Peak squeeze at top." },
+          { name: "Seated Calf Raise", protocol: "4×15–20", note: "Full stretch at bottom." },
+        ],
+      },
+      {
+        id: 3,
+        label: "REST / ZONE 2",
+        sub: "Active Recovery",
+        exercises: [
+          { name: "Zone 2 Cardio [OPTIONAL]", protocol: "30–45 min @ HR 130–145 BPM", note: "Bike, row, easy jog. Nasal breathing ONLY. If you can't hold a full conversation, you're going too hard. This is recovery medicine — not a workout." },
+        ],
+      },
+      {
+        id: 4,
+        label: "UPPER PULL",
+        sub: "Back / Biceps — Deadlift Priority",
+        exercises: [
+          { name: "CONVENTIONAL DEADLIFT ★★★", protocol: "Wk1-2: 4×4@380 | Wk3-4: 4×4@395 | Wk5-6: 4×3@410 | Wk7-8: 4×3@425 | Wk9-10: 3×3@440", note: "PRIMARY GOAL LIFT. Brace first, lat tension before floor. +5lbs every 2 weeks." },
+          { name: "Weighted Pull-Up", protocol: "4×6–8 | +weight when range achieved", note: "Full dead-hang at bottom every rep." },
+          { name: "Pendlay Row", protocol: "4×8 | explosive pull", note: "Bar returns to floor between reps." },
+          { name: "Single-Arm DB Row", protocol: "3×10–12/arm", note: "Full lat stretch. Elbow to hip, not flaring." },
+          { name: "Face Pull", protocol: "4×20 | light", note: "Every pull session." },
+          { name: "Barbell Curl + Hammer Curl", protocol: "3×10–12 each", note: "Strict barbell, brachialis focus on hammer." },
+        ],
+      },
+      {
+        id: 5,
+        label: "FULL UPPER",
+        sub: "Hypertrophy Volume Day — Push/Pull Balance",
+        exercises: [
+          { name: "Flat DB Press + Chest-Supported Row", protocol: "4×12–15 each | superset | 60-sec rest", note: "Push/pull antagonist superset. Efficient and balanced." },
+          { name: "Incline Cable Fly + Lat Pulldown (neutral)", protocol: "3×15–20 / 3×12–15 | superset", note: "Constant tension on fly. Full stretch on pulldown." },
+          { name: "DB Lateral Raise + Rear Delt Fly", protocol: "4×15–20 each | superset", note: "Light weight, feel the muscle — no momentum." },
+          { name: "Skull Crusher + Incline DB Curl", protocol: "3×12–15 each | superset", note: "Full stretch on both. Slow and controlled." },
+          { name: "Finisher (optional)", protocol: "2×15 Cable Curl + 2×15 BW Dips", note: "Only if energy allows." },
+        ],
+      },
+      {
+        id: 6,
+        label: "CONDITIONING",
+        sub: "HYROX Aerobic Foundation Build",
+        exercises: [
+          { name: "WEEKS 1–5: Aerobic Foundation", protocol: "5 rounds @ 70% effort | Rest 2 min between rounds", note: "500m Row (2:05–2:15 pace) → 200m Ski Erg (easy) → 15 Wall Balls (20lb/10ft) → 200m easy run. ~35–40 min total. AEROBIC — not a grinder." },
+          { name: "WEEKS 6–10: HYROX Skills Intro", protocol: "4 rounds @ 75% effort | Rest 90 sec between rounds", note: "500m Row → 200m Ski Erg → 20 Wall Balls → 10 Burpee Broad Jumps → 50m Sled Push (70–90kg). Add: 3×50m Farmer's Carry technique (24kg/hand). ~45–55 min total." },
+        ],
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: "PHASE II",
+    label: "Peak & Compete",
+    weeks: "Weeks 11–20",
+    col: "#D03515",
+    analogy: "Bringing cattle to market — you've built the herd, now show up at auction.",
+    overview: "Volume drops, intensity climbs. Every set has a specific purpose. The powerlifting meet is Week 20. Back squat is integrated for meet specificity — your front squat quad work transfers directly. Conditioning reduces to maintenance: protect your CNS for the lifts that matter. Nothing heroic until the platform.",
+    keyTargets: [
+      "Front Squat: 5×3@340 → heavy singles → training PR ~390–400",
+      "BACK SQUAT added Wks 11–19 for meet (competition movement)",
+      "Deadlift: 4×3@415 → 3-attempt sim → meet goal 495–510",
+      "Conditioning: MAINTENANCE ONLY — 3 easy rounds, protect CNS",
+    ],
+    nutrition: "Continue lean bulk. Meet week: add 100–150 kcal carbs for performance. Practice your meet-day eating protocol in training weeks first.",
+    competition: {
+      week: 20,
+      name: "POWERLIFTING MEET",
+      targets: ["Back Squat: 440–455 lbs","Bench Press: 285–300 lbs","Deadlift: 495–510 lbs"],
+      note: "Front Squat training PR expected Wk 17–18: ~390–400 lbs. Compete at training bodyweight — no cuts.",
+    },
+    days: [
+      {
+        id: 1,
+        label: "UPPER PUSH",
+        sub: "Strength Intensification",
+        exercises: [
+          { name: "Incline Barbell Bench", protocol: "Wk11: 4×4 | Wk13: 4×3@87% | Wk15: 3×2@90% | Wk17: heavy single | Wk19: DELOAD 3×5@70%", note: "Volume drops each block, intensity rises. Build toward a heavy single confidence attempt." },
+          { name: "Flat Barbell Bench", protocol: "3×6–8 @ moderate", note: "Meet practice. Secondary press maintenance." },
+          { name: "OHP", protocol: "3×5–6 @ 75%", note: "Maintenance only." },
+          { name: "Lateral Raise + Face Pull", protocol: "3×15 / 3×20", note: "Keep shoulders healthy through the intensity ramp." },
+          { name: "Close Grip Bench", protocol: "2×8", note: "Tricep lockout strength for meet bench." },
+        ],
+      },
+      {
+        id: 2,
+        label: "LOWER — SQUAT PEAK",
+        sub: "Front Squat Peak + Back Squat Meet Prep",
+        exercises: [
+          { name: "FRONT SQUAT PEAK ★★★", protocol: "Wk11: 5×3@340 | Wk13: 4×3@353 | Wk15: 3×2@365 | Wk17: work to ~380–393 single | Wk18: 3-attempt simulation | Wk19: DELOAD 3×3@280", note: "Wk 17–18: competition-style attempts. Practice squat commands. RESPECT the deload week." },
+          { name: "BACK SQUAT ★ [ADDED FOR MEET]", protocol: "Wks 11–18: 3×3 after front squats @ 85–87% | Wk11: ~375 | Wk16: ~415 | Wk18: opener rehearsal ~430", note: "Low-bar position. Practice 'squat' and 'rack' commands. Phase OUT at Wk 19. Your front squat quad base makes this easier than it looks." },
+          { name: "Leg Press", protocol: "3×10 | maintenance", note: "Maintenance volume only." },
+          { name: "Leg Extension + RDL", protocol: "3×15 / 3×8", note: "Quad maintenance + posterior chain support for deadlift." },
+        ],
+      },
+      {
+        id: 3,
+        label: "REST [MANDATORY]",
+        sub: "CNS Recovery — Do Not Compromise",
+        exercises: [
+          { name: "FULL REST", protocol: "No lifting | 20-min walk max if needed", note: "With peak-intensity lifting, Day 3 is NON-NEGOTIABLE rest. The gains happen here — not in the gym. Sleep, eat, recover. This is where the fence gets stronger." },
+        ],
+      },
+      {
+        id: 4,
+        label: "UPPER PULL",
+        sub: "Deadlift Peak + Back Maintenance",
+        exercises: [
+          { name: "CONVENTIONAL DEADLIFT PEAK ★★★", protocol: "Wk11: 4×3@415 | Wk13: 3×3@430 | Wk15: 3×2@450 | Wk17: singles ~475–488 | Wk18: 3-attempt sim (opener 460 / 485 / 505) | Wk19: DELOAD 3×3@360", note: "Week 18 is the dry run. Opener = 94–95% of best. Build confidence. The PR comes meet day." },
+          { name: "Weighted Pull-Up", protocol: "4×6 | maintenance", note: "Maintain pull strength." },
+          { name: "Pendlay Row", protocol: "3×8 | maintenance", note: "" },
+          { name: "Face Pull + Curl", protocol: "3×20 / 2×12", note: "Health + maintenance." },
+        ],
+      },
+      {
+        id: 5,
+        label: "FULL UPPER",
+        sub: "Reduced Volume — Hypertrophy Maintenance",
+        exercises: [
+          { name: "DB Press (incline or flat)", protocol: "3×10–12", note: "Reduced from Phase I. Maintain stimulus, protect recovery for primary lifts." },
+          { name: "Chest-Supported Row", protocol: "3×12", note: "" },
+          { name: "Lateral Raise + Rear Delt Fly", protocol: "3×15 each", note: "" },
+          { name: "Pushdown + Curl Superset", protocol: "3×12–15 each", note: "Keep it moving. No heroics here." },
+        ],
+      },
+      {
+        id: 6,
+        label: "CONDITIONING",
+        sub: "Aerobic Maintenance ONLY",
+        exercises: [
+          { name: "Weeks 11–18: Easy Maintenance", protocol: "3 rounds @ 60–65% effort | Full rest between rounds", note: "500m Row + 200m Ski Erg + 15 Wall Balls + 10 Burpee Broad Jumps. ~25–30 min. PURPOSE: preserve aerobic base WITHOUT draining CNS." },
+          { name: "WEEK 20 — MEET WEEK", protocol: "NO CONDITIONING | 20-min walk only", note: "Arrive at the platform FRESH. Nothing you do the week before can help you — only hurt you." },
+        ],
+      },
+    ],
+  },
