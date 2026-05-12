@@ -1,387 +1,410 @@
-import { useState } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Trifecta — 65-Week Training Program</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; background: #0A0A0E; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
 
-const phases = [
-  {
-    id:1, name:"PHASE I", label:"Foundation", weeks:"Weeks 1–10", col:"#E8920A",
-    analogy:"Laying fence posts — every post matters, the fence follows.",
-    overview:"Build the work capacity base before asking the body to peak. Strength volume is high, intensity moderate, conditioning grows from the ground up. This is the infrastructure phase — like stringing wire before the cattle ever see the fence. Without this, Phases II–IV fall apart.",
-    keyTargets:["Front Squat: 5×5 @285 → 4×3 @340","Deadlift: 4×4 @380 → 3×3 @440 + RDL/Leg Curl accessories","Conditioning: aerobic base + HYROX skill introduction","Optional capacity sessions: 2–3x/week, under 30 min (bike, row, run couplets)"],
-    nutrition:"Lean Bulk: +250–300 kcal surplus. 1.1–1.2g protein/lb (~210g+/day). Target weight gain: +0.5–0.75 lbs/week. No dirty bulk — controlled surplus only.",
-    competition:null,
-    days:[
-      {id:1,label:"UPPER PUSH",sub:"Chest / Shoulders / Triceps",exercises:[
-        {name:"Incline Barbell Bench ★★",protocol:"4×5 @ 78–82% | +2.5lbs/week",note:"Primary press strength driver. RPE 8. This sets the trajectory for meet bench."},
-        {name:"Flat DB Press",protocol:"4×10–12",note:"Hypertrophy. Increase load when all 4 sets reach top of rep range."},
-        {name:"Standing OHP",protocol:"3×8 @ 70% | +5lbs/2wks",note:"Overhead stability and delt mass."},
-        {name:"Cable Lateral Raise",protocol:"4×15–20 | 3-sec eccentric",note:"Shoulder health and width. Slow down the eccentric."},
-        {name:"Face Pull [NON-NEGOTIABLE]",protocol:"4×20 | light",note:"Every push session. Rotator cuff and rear delt health. This is insurance."},
-        {name:"Rope Pushdown",protocol:"3×15",note:"Superset with face pull."},
-        {name:"OH Tricep Extension (cable)",protocol:"3×12–15",note:"Long-head emphasis. Full stretch."},
-      ]},
-      {id:2,label:"LOWER — QUAD",sub:"Front Squat Priority + Quad Volume",exercises:[
-        {name:"FRONT SQUAT ★★★",protocol:"Wk1-2: 5×5@285 | Wk3-4: 5×5@295 | Wk5-6: 5×4@310 | Wk7-8: 4×4@325 | Wk9-10: 4×3@340",note:"PRIMARY GOAL LIFT. Film every session. Mandatory wrist/elbow warm-up. +5lbs every 2 weeks."},
-        {name:"Paused Front Squat",protocol:"3×3 @ 65% (~245) | 3-sec pause",note:"Pause in hole. Technique reinforcement only — not a heavy day."},
-        {name:"Leg Press",protocol:"4×12–15",note:"Heels close, quad emphasis. Full ROM."},
-        {name:"Bulgarian Split Squat",protocol:"3×10/leg | BW or light KB",note:"Single-leg stability base. Perfect form before adding load."},
-        {name:"Leg Extension",protocol:"4×15–20 | slow eccentric",note:"Peak squeeze at top."},
-        {name:"Seated Calf Raise",protocol:"4×15–20",note:"Full stretch at bottom."},
-      ]},
-      {id:3,label:"REST / OPTIONAL CONDITIONING",sub:"Recovery + Capacity Builders — 2–3x/week max across the week",exercises:[
-        {name:"Zone 2 Base [OPTIONAL]",protocol:"30–45 min @ HR 130–145 BPM",note:"Bike, row, or easy jog. Nasal breathing ONLY. If you can't hold a conversation, back off. Recovery medicine, not a workout."},
-        {name:"OPTION A — Assault Bike Intervals",protocol:"20 min EMOM: :30 hard / :30 easy | RPE 7–8 on work intervals",note:"Single modality. Surgical cardiac output work without touching the legs or back. Under 25 min total. Best choice when lower body is beat up from Day 2."},
-        {name:"OPTION B — Row Steady State",protocol:"20 min @ 2:10–2:20/500m | smooth, not grinding",note:"Single modality. Low impact. Good mid-week choice when legs are fresh but you want aerobic work without running stress."},
-        {name:"OPTION C — Run / Row Couplet",protocol:"3 rounds: 400m run + 500m row | rest 90 sec | ~22–25 min total",note:"Two modalities, no equipment conflict. Run at conversational pace — aerobic development, not a sprint test. Think easy cattle drive pace, not a stampede."},
-        {name:"OPTION D — Bike / Row Couplet",protocol:"4 rounds: 3 min assault bike + 2 min row | rest 60 sec | ~25 min",note:"Zero running stress. Best option after a heavy squat day. Keep effort at 70–75% — these are irrigation channels widening the aerobic pipe, not flood events."},
-        {name:"⚠ USAGE RULES",protocol:"Max 2–3 optional sessions/week | Never back-to-back days | Also stackable after Day 5 or Day 7",note:"Pick sessions when energy is high, skip when it's not. These are capacity builders, not recovery killers. If strength sessions start feeling flat, pull back to 1 per week."},
-      ]},
-      {id:4,label:"UPPER PULL",sub:"Back / Biceps / Hamstrings — Deadlift Priority",exercises:[
-        {name:"CONVENTIONAL DEADLIFT ★★★",protocol:"Wk1-2: 4×4@380 | Wk3-4: 4×4@395 | Wk5-6: 4×3@410 | Wk7-8: 4×3@425 | Wk9-10: 3×3@440",note:"PRIMARY GOAL LIFT. Brace first, lat tension before floor. +5lbs every 2 weeks."},
-        {name:"Romanian Deadlift (RDL) ★",protocol:"3×10–12 | 3-sec eccentric | @50–55% of DL",note:"Hinge pattern reinforcement without CNS load. Feel the hamstring stretch at the bottom — this isn't a deadlift, it's a tension hold. Like re-tensioning fence wire after a hard pull day."},
-        {name:"Lying Leg Curl",protocol:"3×12–15 | slow eccentric",note:"Hamstring isolation to balance quad volume from Day 2. Keep it controlled — this is accessory work, not a competition."},
-        {name:"Weighted Pull-Up",protocol:"4×6–8 | +weight when range achieved",note:"Full dead-hang at bottom every rep."},
-        {name:"Pendlay Row",protocol:"4×8 | explosive pull",note:"Bar returns to floor between reps."},
-        {name:"Single-Arm DB Row",protocol:"3×10–12/arm",note:"Full lat stretch. Elbow to hip, not flaring."},
-        {name:"Face Pull",protocol:"4×20 | light",note:"Every pull session."},
-        {name:"Barbell Curl + Hammer Curl",protocol:"2×10–12 each",note:"Trimmed to 2 sets to offset hamstring volume added above. Strict barbell, brachialis focus on hammer."},
-      ]},
-      {id:5,label:"FULL UPPER",sub:"Hypertrophy Volume Day — Push/Pull Balance",exercises:[
-        {name:"Flat DB Press + Chest-Supported Row",protocol:"4×12–15 each | superset | 60-sec rest",note:"Push/pull antagonist superset. Efficient and balanced."},
-        {name:"Incline Cable Fly + Lat Pulldown (neutral)",protocol:"3×15–20 / 3×12–15 | superset",note:"Constant tension on fly. Full stretch on pulldown."},
-        {name:"DB Lateral Raise + Rear Delt Fly",protocol:"4×15–20 each | superset",note:"Light weight, feel the muscle — no momentum."},
-        {name:"Skull Crusher + Incline DB Curl",protocol:"3×12–15 each | superset",note:"Full stretch on both. Slow and controlled."},
-        {name:"Finisher (optional)",protocol:"2×15 Cable Curl + 2×15 BW Dips",note:"Only if energy allows."},
-      ]},
-      {id:6,label:"CONDITIONING",sub:"HYROX Aerobic Foundation Build",exercises:[
-        {name:"WEEKS 1–5: Aerobic Foundation",protocol:"5 rounds @ 70% effort | Rest 2 min between rounds",note:"500m Row (2:05–2:15 pace) → 200m Ski Erg (easy) → 15 Wall Balls (20lb/10ft) → 200m easy run. ~35–40 min total. AEROBIC — not a grinder."},
-        {name:"WEEKS 6–10: HYROX Skills Intro",protocol:"4 rounds @ 75% effort | Rest 90 sec between rounds",note:"500m Row → 200m Ski Erg → 20 Wall Balls → 10 Burpee Broad Jumps → 50m Sled Push (70–90kg). Add: 3×50m Farmer's Carry technique (24kg/hand). ~45–55 min total."},
-      ]},
-    ]
-  },
-  {
-    id:2, name:"PHASE II", label:"Peak & Compete", weeks:"Weeks 11–20", col:"#D03515",
-    analogy:"Bringing cattle to market — you've built the herd, now show up at auction.",
-    overview:"Volume drops, intensity climbs. Every set has a specific purpose. The powerlifting meet is Week 20. Back squat is integrated for meet specificity — your front squat quad work transfers directly. Conditioning reduces to maintenance: protect your CNS for the lifts that matter. Nothing heroic until the platform.",
-    keyTargets:["Front Squat: 5×3@340 → heavy singles → training PR ~390–400","BACK SQUAT added Wks 11–19 for meet (competition movement)","Deadlift: 4×3@415 → 3-attempt sim → meet goal 495–510","Conditioning: MAINTENANCE ONLY — 3 easy rounds, protect CNS"],
-    nutrition:"Continue lean bulk. Meet week: add 100–150 kcal carbs for performance. Practice your meet-day eating protocol in training weeks first.",
-    competition:{week:20,name:"POWERLIFTING MEET",targets:["Back Squat: 440–455 lbs","Bench Press: 285–300 lbs","Deadlift: 495–510 lbs"],note:"Front Squat training PR expected Wk 17–18: ~390–400 lbs. Compete at training bodyweight — no cuts."},
-    days:[
-      {id:1,label:"UPPER PUSH",sub:"Strength Intensification",exercises:[
-        {name:"Incline Barbell Bench",protocol:"Wk11: 4×4 | Wk13: 4×3@87% | Wk15: 3×2@90% | Wk17: heavy single | Wk19: DELOAD 3×5@70%",note:"Volume drops each block, intensity rises. Build toward a heavy single confidence attempt."},
-        {name:"Flat Barbell Bench",protocol:"3×6–8 @ moderate",note:"Meet practice. Secondary press maintenance."},
-        {name:"OHP",protocol:"3×5–6 @ 75%",note:"Maintenance only."},
-        {name:"Lateral Raise + Face Pull",protocol:"3×15 / 3×20",note:"Keep shoulders healthy through the intensity ramp."},
-        {name:"Close Grip Bench",protocol:"2×8",note:"Tricep lockout strength for meet bench."},
-      ]},
-      {id:2,label:"LOWER — SQUAT PEAK",sub:"Front Squat Peak + Back Squat Meet Prep",exercises:[
-        {name:"FRONT SQUAT PEAK ★★★",protocol:"Wk11: 5×3@340 | Wk13: 4×3@353 | Wk15: 3×2@365 | Wk17: work to ~380–393 single | Wk18: 3-attempt simulation | Wk19: DELOAD 3×3@280",note:"Wk 17–18: competition-style attempts. Practice squat commands. RESPECT the deload week."},
-        {name:"BACK SQUAT ★ [ADDED FOR MEET]",protocol:"Wks 11–18: 3×3 after front squats @ 85–87% | Wk11: ~375 | Wk16: ~415 | Wk18: opener rehearsal ~430",note:"Low-bar position. Practice 'squat' and 'rack' commands. Phase OUT at Wk 19. Your front squat quad base makes this easier than it looks."},
-        {name:"Leg Press",protocol:"3×10 | maintenance",note:"Maintenance volume only."},
-        {name:"Leg Extension + RDL",protocol:"3×15 / 3×8",note:"Quad maintenance + posterior chain support for deadlift."},
-      ]},
-      {id:3,label:"REST [MANDATORY]",sub:"CNS Recovery — Do Not Compromise",exercises:[
-        {name:"FULL REST",protocol:"No lifting | 20-min walk max if needed",note:"With peak-intensity lifting, Day 3 is NON-NEGOTIABLE rest. The gains happen here — not in the gym. Sleep, eat, recover. This is where the fence gets stronger."},
-      ]},
-      {id:4,label:"UPPER PULL",sub:"Deadlift Peak + Back Maintenance",exercises:[
-        {name:"CONVENTIONAL DEADLIFT PEAK ★★★",protocol:"Wk11: 4×3@415 | Wk13: 3×3@430 | Wk15: 3×2@450 | Wk17: singles ~475–488 | Wk18: 3-attempt sim (opener 460 / 485 / 505) | Wk19: DELOAD 3×3@360",note:"Week 18 is the dry run. Opener = 94–95% of best. Build confidence. The PR comes meet day."},
-        {name:"Weighted Pull-Up",protocol:"4×6 | maintenance",note:"Maintain pull strength."},
-        {name:"Pendlay Row",protocol:"3×8 | maintenance",note:""},
-        {name:"Face Pull + Curl",protocol:"3×20 / 2×12",note:"Health + maintenance."},
-      ]},
-      {id:5,label:"FULL UPPER",sub:"Reduced Volume — Hypertrophy Maintenance",exercises:[
-        {name:"DB Press (incline or flat)",protocol:"3×10–12",note:"Reduced from Phase I. Maintain stimulus, protect recovery for primary lifts."},
-        {name:"Chest-Supported Row",protocol:"3×12",note:""},
-        {name:"Lateral Raise + Rear Delt Fly",protocol:"3×15 each",note:""},
-        {name:"Pushdown + Curl Superset",protocol:"3×12–15 each",note:"Keep it moving. No heroics here."},
-      ]},
-      {id:6,label:"CONDITIONING",sub:"Aerobic Maintenance ONLY",exercises:[
-        {name:"Weeks 11–18: Easy Maintenance",protocol:"3 rounds @ 60–65% effort | Full rest between rounds",note:"500m Row + 200m Ski Erg + 15 Wall Balls + 10 Burpee Broad Jumps. ~25–30 min. PURPOSE: preserve aerobic base WITHOUT draining CNS."},
-        {name:"WEEK 20 — MEET WEEK",protocol:"NO CONDITIONING | 20-min walk only",note:"Arrive at the platform FRESH. Nothing you do the week before can help you — only hurt you."},
-      ]},
-    ]
-  },
-  {
-    id:3, name:"PHASE III", label:"Hypertrophy + HYROX", weeks:"Weeks 21–44", col:"#20884A",
-    analogy:"Trail-blazing new territory — you've proven your strength, now expand your range.",
-    overview:"Two sub-phases: (3a) post-meet hypertrophy surge capitalizing on the strength base, and (3b) progressive HYROX conditioning ramp to sub-75 min. The strength you built is your secret weapon — your deadlift makes sled work feel manageable, your front squat quad development turns sandbag lunges into a technical challenge rather than a gasping survival exercise.",
-    keyTargets:["Hypertrophy: 10–20 rep ranges, 45+ sets/week, full body coverage","Front Squat: 4×6–8 @ 68–72% — MAINTENANCE, not maxing","Deadlift: 3×5 @ 72% (~345) — fence check only, not new fence","HYROX targets: sub-90 (Wk29) → sub-82 (Wk31) → sub-75 (Wk35)"],
-    nutrition:"Wks 21–28: lean bulk +200 kcal. Wks 29–44: maintenance or slight deficit. High carbs before long conditioning sessions. You'll lean out naturally as conditioning volume spikes — embrace it.",
-    competition:{week:42,name:"HYROX RACE",targets:["Target: Sub-75 minutes","8 km running (8×1 km between stations)","Running pace: 5:00–5:30/km"],note:"Taper Wks 41–42: 40–50% volume cut. Race week: easy movement only, arrive FRESH."},
-    days:[
-      {id:1,label:"UPPER PUSH",sub:"Volume Hypertrophy — Chest / Delt / Tri",exercises:[
-        {name:"Flat Barbell Bench",protocol:"4×8–10 @ 70–75% | 3-sec eccentric",note:"Hypertrophy reps. Not maxing. Feel the pec, not the joint."},
-        {name:"Incline DB Press",protocol:"4×10–12",note:"Full stretch at bottom."},
-        {name:"Cable Fly (low-to-high)",protocol:"3×15–20",note:"Constant tension. Peak squeeze at top."},
-        {name:"Seated DB OHP",protocol:"4×10–12",note:"Delt volume increases this phase."},
-        {name:"Lateral Raise — 3 variations",protocol:"3×15 each — cable / DB / leaning",note:"Rotate all 3 weekly. Medial delt width is the goal."},
-        {name:"Face Pull",protocol:"4×20",note:"Always."},
-        {name:"Rope Pushdown + OH Extension",protocol:"4×15 / 3×12–15",note:"Tricep mass focus."},
-      ]},
-      {id:2,label:"LOWER — VOLUME",sub:"Full Leg Hypertrophy Coverage",exercises:[
-        {name:"Front Squat [MAINTENANCE]",protocol:"4×6–8 @ 68–72% (~255–270)",note:"MAINTENANCE ONLY. Feel the quads. Like checking the fence, not building new posts."},
-        {name:"Hack Squat or Leg Press",protocol:"4×12–15",note:"PRIMARY quad hypertrophy driver this phase."},
-        {name:"Bulgarian Split Squat (DBs)",protocol:"4×10–12/leg",note:"Add weight now. Key mass builder. Your HYROX lunges will thank you."},
-        {name:"Leg Extension (drop set last set)",protocol:"4×15–20",note:"Quad striations begin here."},
-        {name:"Lying Leg Curl",protocol:"4×12–15",note:"Hamstring balance. HYROX running stresses hamstrings — match the load."},
-        {name:"Standing Calf + Seated Calf",protocol:"4×15 / 3×20",note:"Gastroc + soleus."},
-      ]},
-      {id:3,label:"ZONE 2 [MANDATORY]",sub:"Aerobic Engine — Non-Negotiable This Phase",exercises:[
-        {name:"ZONE 2 CARDIO — MANDATORY",protocol:"45–60 min @ HR 130–145 BPM",note:"Bike preferred (lower injury risk with heavy HYROX conditioning volume). Nasal breathing ONLY. This builds the aerobic engine HYROX demands. Skip this and you're trying to ride a horse with no lungs."},
-      ]},
-      {id:4,label:"UPPER PULL",sub:"Back Mass + Deadlift Maintenance",exercises:[
-        {name:"Conventional Deadlift [MAINTENANCE]",protocol:"3×5 @ 72% (~345)",note:"Fence check — not new fence. Keep the hinge pattern alive. Protect CNS for conditioning volume."},
-        {name:"Weighted Pull-Up",protocol:"4×8–10 | +weight when range hit",note:"Full ROM. Back width is building."},
-        {name:"Pendlay Row",protocol:"4×8 | explosive",note:""},
-        {name:"Cable Row (rotate grips weekly)",protocol:"3×12–15",note:"Neutral / wide / underhand. Rotate weekly for full back development."},
-        {name:"Face Pull + Shrug",protocol:"4×20 / 3×12",note:"Health + trap thickness."},
-        {name:"Curl Complex (3 variations)",protocol:"3×10–12 each",note:"Barbell → DB → Cable. Volume for bicep mass."},
-      ]},
-      {id:5,label:"FULL UPPER",sub:"Maximum Hypertrophy Volume",exercises:[
-        {name:"Incline DB Press + Chest-Supported Row",protocol:"4×12 each | superset | 60-sec rest",note:""},
-        {name:"Pec Deck + Wide-Grip Lat Pulldown",protocol:"3×15–20 / 3×12–15 | superset",note:""},
-        {name:"Cable Lateral + Rear Delt Cable",protocol:"4×20 each | superset",note:"Light, slow, feel it."},
-        {name:"EZ Bar Curl + Weighted Dips",protocol:"4×12 each | superset",note:""},
-      ]},
-      {id:6,label:"HYROX CONDITIONING",sub:"Race Simulation — The Mission of Phase III",exercises:[
-        {name:"Wks 23–28 (Phase 3a): Segment Builder",protocol:"4 rounds | REST LIBERALLY between rounds",note:"1km Run → 1000m SkiErg → 1km Run → 50m Sled Push (152kg) → 1km Run → 50m Sled Pull (103kg). Focus: technique and even pacing. NOT about suffering yet."},
-        {name:"Wks 29–36 (Phase 3b): Full Race Simulations",protocol:"1× full 8-station sim/wk + 1× partial (4-station)",note:"Time every session. FULL HYROX course. Targets: sub-90 (Wk29) → sub-82 (Wk31) → sub-78 (Wk33) → sub-75 (Wk35). Running: 5:00–5:30/km all 8km."},
-        {name:"Wks 37–40 (Phase 3c): Race-Pace Specificity",protocol:"1× full sim at race pace + interval work on weak stations",note:"Log every station split. Find your slowest 2 stations and drill them specifically with targeted intervals."},
-        {name:"Wks 41–44: TAPER",protocol:"Volume CUT 40–50% | Race week: easy movement only",note:"Maintain intensity, slash volume. Nothing you do race week helps you — it can only hurt. Arrive at the start line hungry, not depleted."},
-      ]},
-    ]
-  },
-  {
-    id:4, name:"PHASE IV", label:"Mass Building + Stage", weeks:"Weeks 45–65", col:"#7050D0",
-    analogy:"Building the ranch house — you've fenced the land and proven you can ride. Now build something lasting.",
-    overview:"Two sub-phases: (4a) post-HYROX lean bulk maximizing final mass gains, and (4b) 16-week contest prep. The HYROX conditioning leaves you leaner and more conditioned coming in — exceptional contest prep starting point. Phases I–III gave you the muscle to show. This phase is the culmination. All three competitions built on one another exactly as designed.",
-    keyTargets:["Lean bulk Wks 45–49: final mass push before prep","Front Squat + Deadlift maintained Wks 45–54, PHASED OUT at Wk 55","Contest prep Wks 50–65: progressive caloric deficit -400 to -500 kcal","Realistic stage: 170–178 lbs at 7–9% BF | Class: Classic Physique or Men's Physique"],
-    nutrition:"Wks 45–49: lean bulk +200 kcal. Wks 50–65: progressive deficit -400 to -500 kcal. Protein UP to 1.2–1.3g/lb. Carb cycling optional. PEAK WEEK: coordinate carb/water protocol with an experienced prep coach — don't improvise peak week.",
-    competition:{week:65,name:"BODYBUILDING SHOW",targets:["Class: Classic Physique or Men's Physique","Stage weight: ~170–178 lbs","Target BF: 7–9%"],note:"NPC/OCB local show recommended. Work with a contest prep coach for peak week specifics."},
-    days:[
-      {id:1,label:"UPPER PUSH",sub:"Hypertrophy → Contest Prep Polish",exercises:[
-        {name:"Flat Barbell Bench (Wks 45–54)",protocol:"4×8–10 @ 72–75%",note:"Phase out heavy work at Wk 55 when prep intensifies. Safety first when calories drop."},
-        {name:"Incline DB Press",protocol:"4×10–12",note:"Upper chest. Throughout all of Phase IV."},
-        {name:"Pec Deck + Cable Fly",protocol:"3×15–20 each",note:"Peak contraction and mind-muscle. Contest: slow and deliberate."},
-        {name:"Seated OHP",protocol:"3×10–12",note:""},
-        {name:"DB Lateral Raise [5 SETS — STAGE EMPHASIS]",protocol:"5×15–20",note:"FIVE SETS. The capped delt look under stage lighting is built here."},
-        {name:"Face Pull",protocol:"4×20",note:"Always. Especially in prep."},
-        {name:"Pushdown + OH Extension",protocol:"3×15 / 3×12 | superset",note:""},
-      ]},
-      {id:2,label:"LOWER — SEPARATION",sub:"Quad / Glute / Hamstring for Stage",exercises:[
-        {name:"Front Squat (Wks 45–54 ONLY)",protocol:"4×6–8 @ 68%",note:"PHASE OUT at Wk 55. Protect joints during caloric deficit."},
-        {name:"Hack Squat",protocol:"4×12–15",note:"Primary quad driver through ALL of Phase IV including prep."},
-        {name:"Leg Press (feet high)",protocol:"3×15",note:"Glute emphasis for stage."},
-        {name:"Walking Lunge (DBs)",protocol:"3×20 steps",note:"Contest conditioning movement. Keeps legs hard and full."},
-        {name:"Leg Extension (drop set)",protocol:"4×15–20",note:"Quad striations under stage lights."},
-        {name:"Lying Leg Curl",protocol:"4×12–15",note:""},
-        {name:"Standing Calf Raise [5 SETS]",protocol:"5×20",note:"FIVE SETS. Calf development matters under stage lighting."},
-      ]},
-      {id:3,label:"REST / CARDIO",sub:"Recovery → Contest Cardio Escalation",exercises:[
-        {name:"Wks 45–49: Rest or Optional Zone 2",protocol:"Optional 30 min only",note:"Post-HYROX recovery. Let the body rebuild before prep begins."},
-        {name:"Wks 50–65 [Contest Prep]: LISS — MANDATORY",protocol:"40–60 min incline walk or bike",note:"Incline treadmill: 3.5 mph, 10–15% grade. Or bike. Burns fat without muscle loss. Add a SECOND session on Day 7 in final 4 weeks if needed to hit stage conditioning."},
-      ]},
-      {id:4,label:"UPPER PULL",sub:"Back Width + Thickness + Bicep Peak",exercises:[
-        {name:"Conventional Deadlift (Wks 45–54)",protocol:"3×5 @ 72% | maintenance",note:"Phase out at Wk 55."},
-        {name:"Wide-Grip Pull-Up",protocol:"4×10–12 | BW in prep",note:"Lat width. V-taper is the most visible element of Classic Physique."},
-        {name:"Lat Pulldown (wide grip)",protocol:"4×12–15",note:"Slow eccentric in prep. Mind-muscle over weight."},
-        {name:"Cable Row (close grip)",protocol:"4×12–15",note:"Mid-back thickness."},
-        {name:"Single-Arm DB Row",protocol:"3×12/arm",note:""},
-        {name:"Face Pull",protocol:"4×20",note:""},
-        {name:"Concentration Curl + Cable Curl",protocol:"4×12–15 / 3×15",note:"Bicep peak. Full supination on concentration curl."},
-      ]},
-      {id:5,label:"FULL UPPER",sub:"Volume / Pre-Contest Polish",exercises:[
-        {name:"Machine Chest Press + Machine Row",protocol:"4×12–15 each | superset",note:"Machines SAFER in caloric deficit — reduced injury risk when fatigued."},
-        {name:"Incline DB Fly + Straight-Arm Pulldown",protocol:"3×15–20 each | superset",note:"Stretch and squeeze. Constant tension."},
-        {name:"Cable Lateral Raise [5 SETS]",protocol:"5×20",note:"Shoulder cap for stage. Five sets."},
-        {name:"Cable Rear Delt Fly",protocol:"4×20",note:""},
-        {name:"Rope Pushdown + Spider Curl",protocol:"4×15 / 4×12 | superset",note:"Spider curl for bicep peak separation."},
-      ]},
-      {id:6,label:"CONDITIONING / CARDIO",sub:"Maintain Fitness → Accelerate Fat Loss",exercises:[
-        {name:"Wks 45–49: HYROX Maintenance",protocol:"3 rounds, partial simulation, easy-moderate",note:"3 rounds: 2–3 stations + 1km runs. ~30–40 min. Don't lose what you built."},
-        {name:"Wks 50–65: Cardio Acceleration",protocol:"45–60 min moderate steady state",note:"Replace HYROX with fat-burning cardio. Example: 20-min incline walk + 20-min bike + 10-min ski erg. This is your SECOND cardio day of the week during prep."},
-      ]},
-    ]
-  },
-];
+  <script type="text/babel">
+    const { useState } = React;
 
-const comps = [
-  {week:20,name:"Powerlifting Meet",col:"#D03515",emoji:"🏋️",targets:["Back Squat: 440–455 lbs","Bench: 285–300 lbs","Deadlift: 495–510 lbs","Front Squat training PR: ~390–400"]},
-  {week:42,name:"HYROX Race",col:"#20884A",emoji:"🏃",targets:["Sub-75 minutes","8 km total running (8×1km)","Running: 5:00–5:30/km pace","All 8 HYROX stations"]},
-  {week:65,name:"Bodybuilding Show",col:"#7050D0",emoji:"💪",targets:["Classic Physique / Men's Physique","Stage weight: ~170–178 lbs","Target BF: 7–9%"]},
-];
+    const phases = [
+      {
+        id:1, name:"PHASE I", label:"Foundation", weeks:"Weeks 1–10", col:"#E8920A",
+        analogy:"Laying fence posts — every post matters, the fence follows.",
+        overview:"Build the work capacity base before asking the body to peak. Strength volume is high, intensity moderate, conditioning grows from the ground up. This is the infrastructure phase — like stringing wire before the cattle ever see the fence. Without this, Phases II–IV fall apart.",
+        keyTargets:["Front Squat: 5×5 @285 → 4×3 @340","Deadlift: 4×4 @380 → 3×3 @440 + RDL/Leg Curl accessories","Conditioning: aerobic base + HYROX skill introduction","Optional capacity sessions: 2–3x/week, under 30 min (bike, row, run couplets)"],
+        nutrition:"Lean Bulk: +250–300 kcal surplus. 1.1–1.2g protein/lb (~210g+/day). Target weight gain: +0.5–0.75 lbs/week. No dirty bulk — controlled surplus only.",
+        competition:null,
+        days:[
+          {id:1,label:"UPPER PUSH",sub:"Chest / Shoulders / Triceps",exercises:[
+            {name:"Incline Barbell Bench ★★",protocol:"4×5 @ 78–82% | +2.5lbs/week",note:"Primary press strength driver. RPE 8. This sets the trajectory for meet bench."},
+            {name:"Flat DB Press",protocol:"4×10–12",note:"Hypertrophy. Increase load when all 4 sets reach top of rep range."},
+            {name:"Standing OHP",protocol:"3×8 @ 70% | +5lbs/2wks",note:"Overhead stability and delt mass."},
+            {name:"Cable Lateral Raise",protocol:"4×15–20 | 3-sec eccentric",note:"Shoulder health and width. Slow down the eccentric."},
+            {name:"Face Pull [NON-NEGOTIABLE]",protocol:"4×20 | light",note:"Every push session. Rotator cuff and rear delt health. This is insurance."},
+            {name:"Rope Pushdown",protocol:"3×15",note:"Superset with face pull."},
+            {name:"OH Tricep Extension (cable)",protocol:"3×12–15",note:"Long-head emphasis. Full stretch."},
+          ]},
+          {id:2,label:"LOWER — QUAD",sub:"Front Squat Priority + Quad Volume",exercises:[
+            {name:"FRONT SQUAT ★★★",protocol:"Wk1-2: 5×5@285 | Wk3-4: 5×5@295 | Wk5-6: 5×4@310 | Wk7-8: 4×4@325 | Wk9-10: 4×3@340",note:"PRIMARY GOAL LIFT. Film every session. Mandatory wrist/elbow warm-up. +5lbs every 2 weeks."},
+            {name:"Paused Front Squat",protocol:"3×3 @ 65% (~245) | 3-sec pause",note:"Pause in hole. Technique reinforcement only — not a heavy day."},
+            {name:"Leg Press",protocol:"4×12–15",note:"Heels close, quad emphasis. Full ROM."},
+            {name:"Bulgarian Split Squat",protocol:"3×10/leg | BW or light KB",note:"Single-leg stability base. Perfect form before adding load."},
+            {name:"Leg Extension",protocol:"4×15–20 | slow eccentric",note:"Peak squeeze at top."},
+            {name:"Seated Calf Raise",protocol:"4×15–20",note:"Full stretch at bottom."},
+          ]},
+          {id:3,label:"REST / OPTIONAL CONDITIONING",sub:"Recovery + Capacity Builders — 2–3x/week max across the week",exercises:[
+            {name:"Zone 2 Base [OPTIONAL]",protocol:"30–45 min @ HR 130–145 BPM",note:"Bike, row, or easy jog. Nasal breathing ONLY. If you can't hold a conversation, back off. Recovery medicine, not a workout."},
+            {name:"OPTION A — Assault Bike Intervals",protocol:"20 min EMOM: :30 hard / :30 easy | RPE 7–8 on work intervals",note:"Single modality. Surgical cardiac output work without touching the legs or back. Under 25 min total. Best choice when lower body is beat up from Day 2."},
+            {name:"OPTION B — Row Steady State",protocol:"20 min @ 2:10–2:20/500m | smooth, not grinding",note:"Single modality. Low impact. Good mid-week choice when legs are fresh but you want aerobic work without running stress."},
+            {name:"OPTION C — Run / Row Couplet",protocol:"3 rounds: 400m run + 500m row | rest 90 sec | ~22–25 min total",note:"Two modalities, no equipment conflict. Run at conversational pace — aerobic development, not a sprint test. Think easy cattle drive pace, not a stampede."},
+            {name:"OPTION D — Bike / Row Couplet",protocol:"4 rounds: 3 min assault bike + 2 min row | rest 60 sec | ~25 min",note:"Zero running stress. Best option after a heavy squat day. Keep effort at 70–75% — these are irrigation channels widening the aerobic pipe, not flood events."},
+            {name:"⚠ USAGE RULES",protocol:"Max 2–3 optional sessions/week | Never back-to-back days | Also stackable after Day 5 or Day 7",note:"Pick sessions when energy is high, skip when it's not. These are capacity builders, not recovery killers. If strength sessions start feeling flat, pull back to 1 per week."},
+          ]},
+          {id:4,label:"UPPER PULL",sub:"Back / Biceps / Hamstrings — Deadlift Priority",exercises:[
+            {name:"CONVENTIONAL DEADLIFT ★★★",protocol:"Wk1-2: 4×4@380 | Wk3-4: 4×4@395 | Wk5-6: 4×3@410 | Wk7-8: 4×3@425 | Wk9-10: 3×3@440",note:"PRIMARY GOAL LIFT. Brace first, lat tension before floor. +5lbs every 2 weeks."},
+            {name:"Romanian Deadlift (RDL) ★",protocol:"3×10–12 | 3-sec eccentric | @50–55% of DL",note:"Hinge pattern reinforcement without CNS load. Feel the hamstring stretch at the bottom — this isn't a deadlift, it's a tension hold. Like re-tensioning fence wire after a hard pull day."},
+            {name:"Lying Leg Curl",protocol:"3×12–15 | slow eccentric",note:"Hamstring isolation to balance quad volume from Day 2. Keep it controlled — this is accessory work, not a competition."},
+            {name:"Weighted Pull-Up",protocol:"4×6–8 | +weight when range achieved",note:"Full dead-hang at bottom every rep."},
+            {name:"Pendlay Row",protocol:"4×8 | explosive pull",note:"Bar returns to floor between reps."},
+            {name:"Single-Arm DB Row",protocol:"3×10–12/arm",note:"Full lat stretch. Elbow to hip, not flaring."},
+            {name:"Face Pull",protocol:"4×20 | light",note:"Every pull session."},
+            {name:"Barbell Curl + Hammer Curl",protocol:"2×10–12 each",note:"Trimmed to 2 sets to offset hamstring volume added above. Strict barbell, brachialis focus on hammer."},
+          ]},
+          {id:5,label:"FULL UPPER",sub:"Hypertrophy Volume Day — Push/Pull Balance",exercises:[
+            {name:"Flat DB Press + Chest-Supported Row",protocol:"4×12–15 each | superset | 60-sec rest",note:"Push/pull antagonist superset. Efficient and balanced."},
+            {name:"Incline Cable Fly + Lat Pulldown (neutral)",protocol:"3×15–20 / 3×12–15 | superset",note:"Constant tension on fly. Full stretch on pulldown."},
+            {name:"DB Lateral Raise + Rear Delt Fly",protocol:"4×15–20 each | superset",note:"Light weight, feel the muscle — no momentum."},
+            {name:"Skull Crusher + Incline DB Curl",protocol:"3×12–15 each | superset",note:"Full stretch on both. Slow and controlled."},
+            {name:"Finisher (optional)",protocol:"2×15 Cable Curl + 2×15 BW Dips",note:"Only if energy allows."},
+          ]},
+          {id:6,label:"CONDITIONING",sub:"HYROX Aerobic Foundation Build",exercises:[
+            {name:"WEEKS 1–5: Aerobic Foundation",protocol:"5 rounds @ 70% effort | Rest 2 min between rounds",note:"500m Row (2:05–2:15 pace) → 200m Ski Erg (easy) → 15 Wall Balls (20lb/10ft) → 200m easy run. ~35–40 min total. AEROBIC — not a grinder."},
+            {name:"WEEKS 6–10: HYROX Skills Intro",protocol:"4 rounds @ 75% effort | Rest 90 sec between rounds",note:"500m Row → 200m Ski Erg → 20 Wall Balls → 10 Burpee Broad Jumps → 50m Sled Push (70–90kg). Add: 3×50m Farmer's Carry technique (24kg/hand). ~45–55 min total."},
+          ]},
+        ]
+      },
+      {
+        id:2, name:"PHASE II", label:"Peak & Compete", weeks:"Weeks 11–20", col:"#D03515",
+        analogy:"Bringing cattle to market — you've built the herd, now show up at auction.",
+        overview:"Volume drops, intensity climbs. Every set has a specific purpose. The powerlifting meet is Week 20. Back squat is integrated for meet specificity — your front squat quad work transfers directly. Conditioning reduces to maintenance: protect your CNS for the lifts that matter. Nothing heroic until the platform.",
+        keyTargets:["Front Squat: 5×3@340 → heavy singles → training PR ~390–400","BACK SQUAT added Wks 11–19 for meet (competition movement)","Deadlift: 4×3@415 → 3-attempt sim → meet goal 495–510","Conditioning: MAINTENANCE ONLY — 3 easy rounds, protect CNS"],
+        nutrition:"Continue lean bulk. Meet week: add 100–150 kcal carbs for performance. Practice your meet-day eating protocol in training weeks first.",
+        competition:{week:20,name:"POWERLIFTING MEET",targets:["Back Squat: 440–455 lbs","Bench Press: 285–300 lbs","Deadlift: 495–510 lbs"],note:"Front Squat training PR expected Wk 17–18: ~390–400 lbs. Compete at training bodyweight — no cuts."},
+        days:[
+          {id:1,label:"UPPER PUSH",sub:"Strength Intensification",exercises:[
+            {name:"Incline Barbell Bench",protocol:"Wk11: 4×4 | Wk13: 4×3@87% | Wk15: 3×2@90% | Wk17: heavy single | Wk19: DELOAD 3×5@70%",note:"Volume drops each block, intensity rises. Build toward a heavy single confidence attempt."},
+            {name:"Flat Barbell Bench",protocol:"3×6–8 @ moderate",note:"Meet practice. Secondary press maintenance."},
+            {name:"OHP",protocol:"3×5–6 @ 75%",note:"Maintenance only."},
+            {name:"Lateral Raise + Face Pull",protocol:"3×15 / 3×20",note:"Keep shoulders healthy through the intensity ramp."},
+            {name:"Close Grip Bench",protocol:"2×8",note:"Tricep lockout strength for meet bench."},
+          ]},
+          {id:2,label:"LOWER — SQUAT PEAK",sub:"Front Squat Peak + Back Squat Meet Prep",exercises:[
+            {name:"FRONT SQUAT PEAK ★★★",protocol:"Wk11: 5×3@340 | Wk13: 4×3@353 | Wk15: 3×2@365 | Wk17: work to ~380–393 single | Wk18: 3-attempt simulation | Wk19: DELOAD 3×3@280",note:"Wk 17–18: competition-style attempts. Practice squat commands. RESPECT the deload week."},
+            {name:"BACK SQUAT ★ [ADDED FOR MEET]",protocol:"Wks 11–18: 3×3 after front squats @ 85–87% | Wk11: ~375 | Wk16: ~415 | Wk18: opener rehearsal ~430",note:"Low-bar position. Practice 'squat' and 'rack' commands. Phase OUT at Wk 19. Your front squat quad base makes this easier than it looks."},
+            {name:"Leg Press",protocol:"3×10 | maintenance",note:"Maintenance volume only."},
+            {name:"Leg Extension + RDL",protocol:"3×15 / 3×8",note:"Quad maintenance + posterior chain support for deadlift."},
+          ]},
+          {id:3,label:"REST [MANDATORY]",sub:"CNS Recovery — Do Not Compromise",exercises:[
+            {name:"FULL REST",protocol:"No lifting | 20-min walk max if needed",note:"With peak-intensity lifting, Day 3 is NON-NEGOTIABLE rest. The gains happen here — not in the gym. Sleep, eat, recover. This is where the fence gets stronger."},
+          ]},
+          {id:4,label:"UPPER PULL",sub:"Deadlift Peak + Back Maintenance",exercises:[
+            {name:"CONVENTIONAL DEADLIFT PEAK ★★★",protocol:"Wk11: 4×3@415 | Wk13: 3×3@430 | Wk15: 3×2@450 | Wk17: singles ~475–488 | Wk18: 3-attempt sim (opener 460 / 485 / 505) | Wk19: DELOAD 3×3@360",note:"Week 18 is the dry run. Opener = 94–95% of best. Build confidence. The PR comes meet day."},
+            {name:"Weighted Pull-Up",protocol:"4×6 | maintenance",note:"Maintain pull strength."},
+            {name:"Pendlay Row",protocol:"3×8 | maintenance",note:""},
+            {name:"Face Pull + Curl",protocol:"3×20 / 2×12",note:"Health + maintenance."},
+          ]},
+          {id:5,label:"FULL UPPER",sub:"Reduced Volume — Hypertrophy Maintenance",exercises:[
+            {name:"DB Press (incline or flat)",protocol:"3×10–12",note:"Reduced from Phase I. Maintain stimulus, protect recovery for primary lifts."},
+            {name:"Chest-Supported Row",protocol:"3×12",note:""},
+            {name:"Lateral Raise + Rear Delt Fly",protocol:"3×15 each",note:""},
+            {name:"Pushdown + Curl Superset",protocol:"3×12–15 each",note:"Keep it moving. No heroics here."},
+          ]},
+          {id:6,label:"CONDITIONING",sub:"Aerobic Maintenance ONLY",exercises:[
+            {name:"Weeks 11–18: Easy Maintenance",protocol:"3 rounds @ 60–65% effort | Full rest between rounds",note:"500m Row + 200m Ski Erg + 15 Wall Balls + 10 Burpee Broad Jumps. ~25–30 min. PURPOSE: preserve aerobic base WITHOUT draining CNS."},
+            {name:"WEEK 20 — MEET WEEK",protocol:"NO CONDITIONING | 20-min walk only",note:"Arrive at the platform FRESH. Nothing you do the week before can help you — only hurt you."},
+          ]},
+        ]
+      },
+      {
+        id:3, name:"PHASE III", label:"Hypertrophy + HYROX", weeks:"Weeks 21–44", col:"#20884A",
+        analogy:"Trail-blazing new territory — you've proven your strength, now expand your range.",
+        overview:"Two sub-phases: (3a) post-meet hypertrophy surge capitalizing on the strength base, and (3b) progressive HYROX conditioning ramp to sub-75 min. The strength you built is your secret weapon — your deadlift makes sled work feel manageable, your front squat quad development turns sandbag lunges into a technical challenge rather than a gasping survival exercise.",
+        keyTargets:["Hypertrophy: 10–20 rep ranges, 45+ sets/week, full body coverage","Front Squat: 4×6–8 @ 68–72% — MAINTENANCE, not maxing","Deadlift: 3×5 @ 72% (~345) — fence check only, not new fence","HYROX targets: sub-90 (Wk29) → sub-82 (Wk31) → sub-75 (Wk35)"],
+        nutrition:"Wks 21–28: lean bulk +200 kcal. Wks 29–44: maintenance or slight deficit. High carbs before long conditioning sessions. You'll lean out naturally as conditioning volume spikes — embrace it.",
+        competition:{week:42,name:"HYROX RACE",targets:["Target: Sub-75 minutes","8 km running (8×1 km between stations)","Running pace: 5:00–5:30/km"],note:"Taper Wks 41–42: 40–50% volume cut. Race week: easy movement only, arrive FRESH."},
+        days:[
+          {id:1,label:"UPPER PUSH",sub:"Volume Hypertrophy — Chest / Delt / Tri",exercises:[
+            {name:"Flat Barbell Bench",protocol:"4×8–10 @ 70–75% | 3-sec eccentric",note:"Hypertrophy reps. Not maxing. Feel the pec, not the joint."},
+            {name:"Incline DB Press",protocol:"4×10–12",note:"Full stretch at bottom."},
+            {name:"Cable Fly (low-to-high)",protocol:"3×15–20",note:"Constant tension. Peak squeeze at top."},
+            {name:"Seated DB OHP",protocol:"4×10–12",note:"Delt volume increases this phase."},
+            {name:"Lateral Raise — 3 variations",protocol:"3×15 each — cable / DB / leaning",note:"Rotate all 3 weekly. Medial delt width is the goal."},
+            {name:"Face Pull",protocol:"4×20",note:"Always."},
+            {name:"Rope Pushdown + OH Extension",protocol:"4×15 / 3×12–15",note:"Tricep mass focus."},
+          ]},
+          {id:2,label:"LOWER — VOLUME",sub:"Full Leg Hypertrophy Coverage",exercises:[
+            {name:"Front Squat [MAINTENANCE]",protocol:"4×6–8 @ 68–72% (~255–270)",note:"MAINTENANCE ONLY. Feel the quads. Like checking the fence, not building new posts."},
+            {name:"Hack Squat or Leg Press",protocol:"4×12–15",note:"PRIMARY quad hypertrophy driver this phase."},
+            {name:"Bulgarian Split Squat (DBs)",protocol:"4×10–12/leg",note:"Add weight now. Key mass builder. Your HYROX lunges will thank you."},
+            {name:"Leg Extension (drop set last set)",protocol:"4×15–20",note:"Quad striations begin here."},
+            {name:"Lying Leg Curl",protocol:"4×12–15",note:"Hamstring balance. HYROX running stresses hamstrings — match the load."},
+            {name:"Standing Calf + Seated Calf",protocol:"4×15 / 3×20",note:"Gastroc + soleus."},
+          ]},
+          {id:3,label:"ZONE 2 [MANDATORY]",sub:"Aerobic Engine — Non-Negotiable This Phase",exercises:[
+            {name:"ZONE 2 CARDIO — MANDATORY",protocol:"45–60 min @ HR 130–145 BPM",note:"Bike preferred (lower injury risk with heavy HYROX conditioning volume). Nasal breathing ONLY. This builds the aerobic engine HYROX demands. Skip this and you're trying to ride a horse with no lungs."},
+          ]},
+          {id:4,label:"UPPER PULL",sub:"Back Mass + Deadlift Maintenance",exercises:[
+            {name:"Conventional Deadlift [MAINTENANCE]",protocol:"3×5 @ 72% (~345)",note:"Fence check — not new fence. Keep the hinge pattern alive. Protect CNS for conditioning volume."},
+            {name:"Weighted Pull-Up",protocol:"4×8–10 | +weight when range hit",note:"Full ROM. Back width is building."},
+            {name:"Pendlay Row",protocol:"4×8 | explosive",note:""},
+            {name:"Cable Row (rotate grips weekly)",protocol:"3×12–15",note:"Neutral / wide / underhand. Rotate weekly for full back development."},
+            {name:"Face Pull + Shrug",protocol:"4×20 / 3×12",note:"Health + trap thickness."},
+            {name:"Curl Complex (3 variations)",protocol:"3×10–12 each",note:"Barbell → DB → Cable. Volume for bicep mass."},
+          ]},
+          {id:5,label:"FULL UPPER",sub:"Maximum Hypertrophy Volume",exercises:[
+            {name:"Incline DB Press + Chest-Supported Row",protocol:"4×12 each | superset | 60-sec rest",note:""},
+            {name:"Pec Deck + Wide-Grip Lat Pulldown",protocol:"3×15–20 / 3×12–15 | superset",note:""},
+            {name:"Cable Lateral + Rear Delt Cable",protocol:"4×20 each | superset",note:"Light, slow, feel it."},
+            {name:"EZ Bar Curl + Weighted Dips",protocol:"4×12 each | superset",note:""},
+          ]},
+          {id:6,label:"HYROX CONDITIONING",sub:"Race Simulation — The Mission of Phase III",exercises:[
+            {name:"Wks 23–28 (Phase 3a): Segment Builder",protocol:"4 rounds | REST LIBERALLY between rounds",note:"1km Run → 1000m SkiErg → 1km Run → 50m Sled Push (152kg) → 1km Run → 50m Sled Pull (103kg). Focus: technique and even pacing. NOT about suffering yet."},
+            {name:"Wks 29–36 (Phase 3b): Full Race Simulations",protocol:"1× full 8-station sim/wk + 1× partial (4-station)",note:"Time every session. FULL HYROX course. Targets: sub-90 (Wk29) → sub-82 (Wk31) → sub-78 (Wk33) → sub-75 (Wk35). Running: 5:00–5:30/km all 8km."},
+            {name:"Wks 37–40 (Phase 3c): Race-Pace Specificity",protocol:"1× full sim at race pace + interval work on weak stations",note:"Log every station split. Find your slowest 2 stations and drill them specifically with targeted intervals."},
+            {name:"Wks 41–44: TAPER",protocol:"Volume CUT 40–50% | Race week: easy movement only",note:"Maintain intensity, slash volume. Nothing you do race week helps you — it can only hurt. Arrive at the start line hungry, not depleted."},
+          ]},
+        ]
+      },
+      {
+        id:4, name:"PHASE IV", label:"Mass Building + Stage", weeks:"Weeks 45–65", col:"#7050D0",
+        analogy:"Building the ranch house — you've fenced the land and proven you can ride. Now build something lasting.",
+        overview:"Two sub-phases: (4a) post-HYROX lean bulk maximizing final mass gains, and (4b) 16-week contest prep. The HYROX conditioning leaves you leaner and more conditioned coming in — exceptional contest prep starting point. Phases I–III gave you the muscle to show. This phase is the culmination. All three competitions built on one another exactly as designed.",
+        keyTargets:["Lean bulk Wks 45–49: final mass push before prep","Front Squat + Deadlift maintained Wks 45–54, PHASED OUT at Wk 55","Contest prep Wks 50–65: progressive caloric deficit -400 to -500 kcal","Realistic stage: 170–178 lbs at 7–9% BF | Class: Classic Physique or Men's Physique"],
+        nutrition:"Wks 45–49: lean bulk +200 kcal. Wks 50–65: progressive deficit -400 to -500 kcal. Protein UP to 1.2–1.3g/lb. Carb cycling optional. PEAK WEEK: coordinate carb/water protocol with an experienced prep coach — don't improvise peak week.",
+        competition:{week:65,name:"BODYBUILDING SHOW",targets:["Class: Classic Physique or Men's Physique","Stage weight: ~170–178 lbs","Target BF: 7–9%"],note:"NPC/OCB local show recommended. Work with a contest prep coach for peak week specifics."},
+        days:[
+          {id:1,label:"UPPER PUSH",sub:"Hypertrophy → Contest Prep Polish",exercises:[
+            {name:"Flat Barbell Bench (Wks 45–54)",protocol:"4×8–10 @ 72–75%",note:"Phase out heavy work at Wk 55 when prep intensifies. Safety first when calories drop."},
+            {name:"Incline DB Press",protocol:"4×10–12",note:"Upper chest. Throughout all of Phase IV."},
+            {name:"Pec Deck + Cable Fly",protocol:"3×15–20 each",note:"Peak contraction and mind-muscle. Contest: slow and deliberate."},
+            {name:"Seated OHP",protocol:"3×10–12",note:""},
+            {name:"DB Lateral Raise [5 SETS — STAGE EMPHASIS]",protocol:"5×15–20",note:"FIVE SETS. The capped delt look under stage lighting is built here."},
+            {name:"Face Pull",protocol:"4×20",note:"Always. Especially in prep."},
+            {name:"Pushdown + OH Extension",protocol:"3×15 / 3×12 | superset",note:""},
+          ]},
+          {id:2,label:"LOWER — SEPARATION",sub:"Quad / Glute / Hamstring for Stage",exercises:[
+            {name:"Front Squat (Wks 45–54 ONLY)",protocol:"4×6–8 @ 68%",note:"PHASE OUT at Wk 55. Protect joints during caloric deficit."},
+            {name:"Hack Squat",protocol:"4×12–15",note:"Primary quad driver through ALL of Phase IV including prep."},
+            {name:"Leg Press (feet high)",protocol:"3×15",note:"Glute emphasis for stage."},
+            {name:"Walking Lunge (DBs)",protocol:"3×20 steps",note:"Contest conditioning movement. Keeps legs hard and full."},
+            {name:"Leg Extension (drop set)",protocol:"4×15–20",note:"Quad striations under stage lights."},
+            {name:"Lying Leg Curl",protocol:"4×12–15",note:""},
+            {name:"Standing Calf Raise [5 SETS]",protocol:"5×20",note:"FIVE SETS. Calf development matters under stage lighting."},
+          ]},
+          {id:3,label:"REST / CARDIO",sub:"Recovery → Contest Cardio Escalation",exercises:[
+            {name:"Wks 45–49: Rest or Optional Zone 2",protocol:"Optional 30 min only",note:"Post-HYROX recovery. Let the body rebuild before prep begins."},
+            {name:"Wks 50–65 [Contest Prep]: LISS — MANDATORY",protocol:"40–60 min incline walk or bike",note:"Incline treadmill: 3.5 mph, 10–15% grade. Or bike. Burns fat without muscle loss. Add a SECOND session on Day 7 in final 4 weeks if needed to hit stage conditioning."},
+          ]},
+          {id:4,label:"UPPER PULL",sub:"Back Width + Thickness + Bicep Peak",exercises:[
+            {name:"Conventional Deadlift (Wks 45–54)",protocol:"3×5 @ 72% | maintenance",note:"Phase out at Wk 55."},
+            {name:"Wide-Grip Pull-Up",protocol:"4×10–12 | BW in prep",note:"Lat width. V-taper is the most visible element of Classic Physique."},
+            {name:"Lat Pulldown (wide grip)",protocol:"4×12–15",note:"Slow eccentric in prep. Mind-muscle over weight."},
+            {name:"Cable Row (close grip)",protocol:"4×12–15",note:"Mid-back thickness."},
+            {name:"Single-Arm DB Row",protocol:"3×12/arm",note:""},
+            {name:"Face Pull",protocol:"4×20",note:""},
+            {name:"Concentration Curl + Cable Curl",protocol:"4×12–15 / 3×15",note:"Bicep peak. Full supination on concentration curl."},
+          ]},
+          {id:5,label:"FULL UPPER",sub:"Volume / Pre-Contest Polish",exercises:[
+            {name:"Machine Chest Press + Machine Row",protocol:"4×12–15 each | superset",note:"Machines SAFER in caloric deficit — reduced injury risk when fatigued."},
+            {name:"Incline DB Fly + Straight-Arm Pulldown",protocol:"3×15–20 each | superset",note:"Stretch and squeeze. Constant tension."},
+            {name:"Cable Lateral Raise [5 SETS]",protocol:"5×20",note:"Shoulder cap for stage. Five sets."},
+            {name:"Cable Rear Delt Fly",protocol:"4×20",note:""},
+            {name:"Rope Pushdown + Spider Curl",protocol:"4×15 / 4×12 | superset",note:"Spider curl for bicep peak separation."},
+          ]},
+          {id:6,label:"CONDITIONING / CARDIO",sub:"Maintain Fitness → Accelerate Fat Loss",exercises:[
+            {name:"Wks 45–49: HYROX Maintenance",protocol:"3 rounds, partial simulation, easy-moderate",note:"3 rounds: 2–3 stations + 1km runs. ~30–40 min. Don't lose what you built."},
+            {name:"Wks 50–65: Cardio Acceleration",protocol:"45–60 min moderate steady state",note:"Replace HYROX with fat-burning cardio. Example: 20-min incline walk + 20-min bike + 10-min ski erg. This is your SECOND cardio day of the week during prep."},
+          ]},
+        ]
+      },
+    ];
 
-const buildLogic = [
-  {title:"Why Powerlifting First (Wk 20)",text:"Compete at peak absolute strength before any hypertrophy phase disrupts loading patterns. The strength base you build here — particularly deadlift and quad development from front squatting — becomes your HYROX secret weapon. Sled pushes, farmer's carries, and wall balls all feel easier when your max outputs are this high."},
-  {title:"Why HYROX Second (Wk 42)",text:"Post-meet, you have the largest strength base of your training life. Now you add conditioning on top of it. Being stronger makes HYROX more efficient — that's the bet. The high conditioning volume also leans you out naturally, giving you a better bodybuilding starting point than any deliberate cut would."},
-  {title:"Why Bodybuilding Last (Wk 65)",text:"The HYROX prep leaves you leaner and more conditioned. The strength work from Phases I–II gave you the muscle. The hypertrophy volume in Phase III filled it out. Contest prep is simply the final polish — revealing what 65 weeks of intelligent sequencing built. The hardest part is already done."},
-  {title:"Physical Limitations Managed",text:"Lower back: deadlift + squat + conditioning overlap is managed by reducing DL to maintenance in Phase III. Shoulders: face pulls are mandatory every session — not optional. Wrists/elbows (front squat): warm-up protocol is mandatory; use wraps if needed. Knees: single-leg work throughout balances bilateral loading."},
-];
+    const comps = [
+      {week:20,name:"Powerlifting Meet",col:"#D03515",emoji:"🏋️",targets:["Back Squat: 440–455 lbs","Bench: 285–300 lbs","Deadlift: 495–510 lbs","Front Squat training PR: ~390–400"]},
+      {week:42,name:"HYROX Race",col:"#20884A",emoji:"🏃",targets:["Sub-75 minutes","8 km total running (8×1km)","Running: 5:00–5:30/km pace","All 8 HYROX stations"]},
+      {week:65,name:"Bodybuilding Show",col:"#7050D0",emoji:"💪",targets:["Classic Physique / Men's Physique","Stage weight: ~170–178 lbs","Target BF: 7–9%"]},
+    ];
 
-export default function App() {
-  const [activePhase, setActivePhase] = useState(0);
-  const [activeDay, setActiveDay] = useState(0);
-  const [showLogic, setShowLogic] = useState(false);
+    const buildLogic = [
+      {title:"Why Powerlifting First (Wk 20)",text:"Compete at peak absolute strength before any hypertrophy phase disrupts loading patterns. The strength base you build here — particularly deadlift and quad development from front squatting — becomes your HYROX secret weapon. Sled pushes, farmer's carries, and wall balls all feel easier when your max outputs are this high."},
+      {title:"Why HYROX Second (Wk 42)",text:"Post-meet, you have the largest strength base of your training life. Now you add conditioning on top of it. Being stronger makes HYROX more efficient — that's the bet. The high conditioning volume also leans you out naturally, giving you a better bodybuilding starting point than any deliberate cut would."},
+      {title:"Why Bodybuilding Last (Wk 65)",text:"The HYROX prep leaves you leaner and more conditioned. The strength work from Phases I–II gave you the muscle. The hypertrophy volume in Phase III filled it out. Contest prep is simply the final polish — revealing what 65 weeks of intelligent sequencing built. The hardest part is already done."},
+      {title:"Physical Limitations Managed",text:"Lower back: deadlift + squat + conditioning overlap is managed by reducing DL to maintenance in Phase III. Shoulders: face pulls are mandatory every session — not optional. Wrists/elbows (front squat): warm-up protocol is mandatory; use wraps if needed. Knees: single-leg work throughout balances bilateral loading."},
+    ];
 
-  const phase = phases[activePhase];
-  const day = phase.days[activeDay];
-  const col = phase.col;
+    function App() {
+      const [activePhase, setActivePhase] = useState(0);
+      const [activeDay, setActiveDay] = useState(0);
+      const [showLogic, setShowLogic] = useState(false);
 
-  return (
-    <div style={{fontFamily:"'Barlow',system-ui,sans-serif",background:"#0A0A0E",minHeight:"100vh",color:"#E0D8CC"}}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-        *{box-sizing:border-box;}
-        ::-webkit-scrollbar{width:4px;height:4px;}
-        ::-webkit-scrollbar-track{background:transparent;}
-        ::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
-        button{cursor:pointer;transition:all .15s;}
-      `}</style>
+      const phase = phases[activePhase];
+      const day = phase.days[activeDay];
+      const col = phase.col;
 
-      {/* HEADER */}
-      <div style={{padding:"18px 16px 14px",borderBottom:"1px solid #1e1e2a",background:"#0A0A0E"}}>
-        <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:28,fontWeight:900,letterSpacing:".07em",color:"#E8920A",lineHeight:1}}>THE TRIFECTA</div>
-        <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,letterSpacing:".2em",color:"#555",marginTop:3}}>65-WEEK · POWERLIFTING + HYROX + BODYBUILDING</div>
-        <div style={{display:"flex",flexWrap:"wrap",gap:"6px 18px",marginTop:10}}>
-          {[["BW","190 lbs"],["BF%","~17%"],["Training Age","22 yrs"],["Front Squat","375→405+"],["Deadlift","480→525+"]].map(([k,v])=>(
-            <div key={k} style={{fontSize:11}}><span style={{color:"#555"}}>{k}: </span><span style={{color:"#E8920A",fontFamily:"'JetBrains Mono',monospace",fontWeight:500}}>{v}</span></div>
-          ))}
-        </div>
-      </div>
+      return (
+        <div style={{fontFamily:"'Barlow',system-ui,sans-serif",background:"#0A0A0E",minHeight:"100vh",color:"#E0D8CC"}}>
+          <style>{`
+            @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+            *{box-sizing:border-box;}
+            ::-webkit-scrollbar{width:4px;height:4px;}
+            ::-webkit-scrollbar-track{background:transparent;}
+            ::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
+            button{cursor:pointer;transition:all .15s;}
+          `}</style>
 
-      {/* COMPETITION TIMELINE */}
-      <div style={{padding:"12px 16px",borderBottom:"1px solid #1a1a24",background:"#0e0e14"}}>
-        <div style={{fontSize:9,letterSpacing:".18em",color:"#555",marginBottom:8,fontFamily:"'Barlow Condensed',sans-serif"}}>COMPETITION TIMELINE — SEQUENCING LOGIC</div>
-        <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4}}>
-          {comps.map(c=>(
-            <div key={c.week} style={{flexShrink:0,background:"#13131e",border:`1px solid ${c.col}28`,borderLeft:`3px solid ${c.col}`,borderRadius:7,padding:"10px 12px",minWidth:160}}>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:"#555",marginBottom:2}}>WEEK {c.week}</div>
-              <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:800,color:c.col,marginBottom:6}}>{c.emoji} {c.name}</div>
-              {c.targets.map(t=><div key={t} style={{fontSize:10,color:"#999",lineHeight:1.7}}>· {t}</div>)}
-            </div>
-          ))}
-          <div style={{flexShrink:0,background:"#13131e",border:"1px solid #2a2a3a",borderLeft:"3px solid #555",borderRadius:7,padding:"10px 12px",minWidth:160}}>
-            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:700,color:"#888",marginBottom:6}}>💡 Why this order?</div>
-            <button onClick={()=>setShowLogic(!showLogic)} style={{fontSize:10,color:"#E8920A",background:"transparent",border:"1px solid #E8920A44",borderRadius:4,padding:"4px 8px"}}>
-              {showLogic?"Hide Logic":"Show Build Logic"}
-            </button>
-          </div>
-        </div>
-        {showLogic && (
-          <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
-            {buildLogic.map(l=>(
-              <div key={l.title} style={{background:"#0f0f18",border:"1px solid #1e1e2a",borderRadius:6,padding:"10px 12px"}}>
-                <div style={{fontSize:11,fontWeight:600,color:"#E8920A",marginBottom:4}}>{l.title}</div>
-                <div style={{fontSize:11,color:"#999",lineHeight:1.7}}>{l.text}</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* PHASE TABS */}
-      <div style={{display:"flex",overflowX:"auto",borderBottom:"1px solid #1a1a24",background:"#0e0e14"}}>
-        {phases.map((p,i)=>(
-          <button key={p.id} onClick={()=>{setActivePhase(i);setActiveDay(0);}}
-            style={{flexShrink:0,padding:"10px 14px",border:"none",borderBottom:`2px solid ${activePhase===i?p.col:"transparent"}`,
-              background:activePhase===i?`${p.col}12`:"transparent",
-              color:activePhase===i?p.col:"#555",textAlign:"left"}}>
-            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,letterSpacing:".1em",fontWeight:700}}>{p.name}</div>
-            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,color:activePhase===i?"#E0D8CC":"#444",marginTop:1}}>{p.label}</div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:"#3a3a44",marginTop:1}}>{p.weeks}</div>
-            {p.competition&&<div style={{fontSize:9,color:p.col,marginTop:4,fontWeight:600}}>🏆 Wk {p.competition.week}</div>}
-          </button>
-        ))}
-      </div>
-
-      {/* PHASE OVERVIEW */}
-      <div style={{padding:"14px 16px",borderBottom:"1px solid #1a1a24",background:"#0e0e16"}}>
-        <div style={{fontSize:12,color:"#aaa",fontStyle:"italic",borderLeft:`3px solid ${col}`,paddingLeft:10,marginBottom:8}}>"{phase.analogy}"</div>
-        <div style={{fontSize:12,color:"#bbb",lineHeight:1.75,marginBottom:10}}>{phase.overview}</div>
-        <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:10}}>
-          {phase.keyTargets.map(t=>(
-            <div key={t} style={{fontSize:10,padding:"3px 8px",background:`${col}0e`,border:`1px solid ${col}20`,borderRadius:4,color:"#bbb"}}>{t}</div>
-          ))}
-        </div>
-        {phase.competition&&(
-          <div style={{background:`${col}0e`,border:`1px solid ${col}30`,borderRadius:7,padding:"10px 12px",marginBottom:10}}>
-            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,color:col,fontWeight:700,letterSpacing:".1em",marginBottom:5}}>🏆 TARGET — WEEK {phase.competition.week}: {phase.competition.name}</div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:"3px 14px",marginBottom:6}}>
-              {phase.competition.targets.map(t=><div key={t} style={{fontFamily:"'JetBrains Mono',monospace",fontSize:11,color:"#d0c0a0"}}>{t}</div>)}
-            </div>
-            {phase.competition.note&&<div style={{fontSize:10,color:"#777"}}>{phase.competition.note}</div>}
-          </div>
-        )}
-        <div style={{background:"#14141e",borderRadius:5,padding:"8px 10px"}}>
-          <span style={{fontSize:9,letterSpacing:".12em",color:"#555"}}>NUTRITION: </span>
-          <span style={{fontSize:11,color:"#999"}}>{phase.nutrition}</span>
-        </div>
-      </div>
-
-      {/* DAY SELECTOR */}
-      <div style={{display:"flex",gap:5,overflowX:"auto",padding:"10px 16px",background:"#0A0A0E",borderBottom:"1px solid #1a1a24"}}>
-        {phase.days.map((d,i)=>(
-          <button key={d.id} onClick={()=>setActiveDay(i)}
-            style={{flexShrink:0,padding:"6px 12px",border:`1px solid ${activeDay===i?col:"#252530"}`,
-              background:activeDay===i?`${col}15`:"#111116",
-              color:activeDay===i?col:"#666",borderRadius:5,fontSize:10,
-              fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,letterSpacing:".05em"}}>
-            DAY {d.id}
-          </button>
-        ))}
-      </div>
-
-      {/* DAY DETAIL */}
-      <div style={{padding:"14px 16px 48px"}}>
-        <div style={{marginBottom:12}}>
-          <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:22,fontWeight:900,color:col,letterSpacing:".04em"}}>{day.label}</div>
-          <div style={{fontSize:11,color:"#888",marginTop:2}}>{day.sub}</div>
-        </div>
-
-        <div style={{overflowX:"auto",borderRadius:8,border:"1px solid #1e1e28"}}>
-          <table style={{width:"100%",borderCollapse:"collapse",fontSize:12,minWidth:520}}>
-            <thead>
-              <tr style={{background:"#13131c",borderBottom:"1px solid #1e1e28"}}>
-                {["Exercise","Protocol / Weekly Progression","Notes & Coaching Cues"].map(h=>(
-                  <th key={h} style={{textAlign:"left",padding:"8px 10px",fontSize:9,letterSpacing:".12em",color:"#555",fontWeight:700,whiteSpace:"nowrap"}}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {day.exercises.map((ex,i)=>{
-                const isPrimary = ex.name.includes("★★★");
-                const isImportant = ex.name.includes("★") || ex.name.includes("[ADDED") || ex.name.includes("[NON-NEG") || ex.name.includes("[MANDATORY");
-                return (
-                  <tr key={i} style={{borderBottom:"1px solid #16161e",background:i%2===1?"#0d0d16":"transparent"}}>
-                    <td style={{padding:"10px 10px",fontWeight:isPrimary?800:isImportant?700:500,
-                      color:isPrimary?col:isImportant?`${col}BB`:"#D4C8B8",
-                      fontSize:isPrimary?13:12,lineHeight:1.4,verticalAlign:"top",whiteSpace:"nowrap",
-                      borderLeft:isPrimary?`3px solid ${col}`:"3px solid transparent"}}>
-                      {ex.name}
-                    </td>
-                    <td style={{padding:"10px 10px",fontSize:11,fontFamily:"'JetBrains Mono',monospace",color:"#A09878",lineHeight:1.7,verticalAlign:"top",maxWidth:280}}>
-                      {ex.protocol}
-                    </td>
-                    <td style={{padding:"10px 10px",fontSize:11,color:"#706050",lineHeight:1.7,verticalAlign:"top",maxWidth:240}}>
-                      {ex.note}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {/* HYROX Station Reference */}
-        {activeDay===5 && activePhase===2 && (
-          <div style={{marginTop:14,background:"#0e1812",border:"1px solid #20884A30",borderRadius:8,padding:"12px 14px"}}>
-            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,letterSpacing:".15em",color:"#20884A",marginBottom:8,fontWeight:700}}>HYROX COURSE REFERENCE (Full Race)</div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:"4px 20px"}}>
-              {["1km Run → 1000m SkiErg","1km Run → 50m Sled Push (152kg men)","1km Run → 50m Sled Pull (103kg men)","1km Run → 80m Burpee Broad Jumps","1km Run → 1000m Row","1km Run → 200m Farmer's Carry (24kg each)","1km Run → 100m Sandbag Lunges (20kg)","1km Run → 100 Wall Balls (6kg/9ft)"].map((s,i)=>(
-                <div key={i} style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:"#7a9a7a"}}>Station {i+1}: {s}</div>
+          {/* HEADER */}
+          <div style={{padding:"18px 16px 14px",borderBottom:"1px solid #1e1e2a",background:"#0A0A0E"}}>
+            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:28,fontWeight:900,letterSpacing:".07em",color:"#E8920A",lineHeight:1}}>THE TRIFECTA</div>
+            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,letterSpacing:".2em",color:"#555",marginTop:3}}>65-WEEK · POWERLIFTING + HYROX + BODYBUILDING</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"6px 18px",marginTop:10}}>
+              {[["BW","190 lbs"],["BF%","~17%"],["Training Age","22 yrs"],["Front Squat","375→405+"],["Deadlift","480→525+"]].map(([k,v])=>(
+                <div key={k} style={{fontSize:11}}><span style={{color:"#555"}}>{k}: </span><span style={{color:"#E8920A",fontFamily:"'JetBrains Mono',monospace",fontWeight:500}}>{v}</span></div>
               ))}
             </div>
           </div>
-        )}
-      </div>
-    </div>
-  );
-}
+
+          {/* COMPETITION TIMELINE */}
+          <div style={{padding:"12px 16px",borderBottom:"1px solid #1a1a24",background:"#0e0e14"}}>
+            <div style={{fontSize:9,letterSpacing:".18em",color:"#555",marginBottom:8,fontFamily:"'Barlow Condensed',sans-serif"}}>COMPETITION TIMELINE — SEQUENCING LOGIC</div>
+            <div style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:4}}>
+              {comps.map(c=>(
+                <div key={c.week} style={{flexShrink:0,background:"#13131e",border:`1px solid ${c.col}28`,borderLeft:`3px solid ${c.col}`,borderRadius:7,padding:"10px 12px",minWidth:160}}>
+                  <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:"#555",marginBottom:2}}>WEEK {c.week}</div>
+                  <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:800,color:c.col,marginBottom:6}}>{c.emoji} {c.name}</div>
+                  {c.targets.map(t=><div key={t} style={{fontSize:10,color:"#999",lineHeight:1.7}}>· {t}</div>)}
+                </div>
+              ))}
+              <div style={{flexShrink:0,background:"#13131e",border:"1px solid #2a2a3a",borderLeft:"3px solid #555",borderRadius:7,padding:"10px 12px",minWidth:160}}>
+                <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,fontWeight:700,color:"#888",marginBottom:6}}>💡 Why this order?</div>
+                <button onClick={()=>setShowLogic(!showLogic)} style={{fontSize:10,color:"#E8920A",background:"transparent",border:"1px solid #E8920A44",borderRadius:4,padding:"4px 8px"}}>
+                  {showLogic?"Hide Logic":"Show Build Logic"}
+                </button>
+              </div>
+            </div>
+            {showLogic && (
+              <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
+                {buildLogic.map(l=>(
+                  <div key={l.title} style={{background:"#0f0f18",border:"1px solid #1e1e2a",borderRadius:6,padding:"10px 12px"}}>
+                    <div style={{fontSize:11,fontWeight:600,color:"#E8920A",marginBottom:4}}>{l.title}</div>
+                    <div style={{fontSize:11,color:"#999",lineHeight:1.7}}>{l.text}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* PHASE TABS */}
+          <div style={{display:"flex",overflowX:"auto",borderBottom:"1px solid #1a1a24",background:"#0e0e14"}}>
+            {phases.map((p,i)=>(
+              <button key={p.id} onClick={()=>{setActivePhase(i);setActiveDay(0);}}
+                style={{flexShrink:0,padding:"10px 14px",border:"none",borderBottom:`2px solid ${activePhase===i?p.col:"transparent"}`,
+                  background:activePhase===i?`${p.col}12`:"transparent",
+                  color:activePhase===i?p.col:"#555",textAlign:"left"}}>
+                <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,letterSpacing:".1em",fontWeight:700}}>{p.name}</div>
+                <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,color:activePhase===i?"#E0D8CC":"#444",marginTop:1}}>{p.label}</div>
+                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:"#3a3a44",marginTop:1}}>{p.weeks}</div>
+                {p.competition&&<div style={{fontSize:9,color:p.col,marginTop:4,fontWeight:600}}>🏆 Wk {p.competition.week}</div>}
+              </button>
+            ))}
+          </div>
+
+          {/* PHASE OVERVIEW */}
+          <div style={{padding:"14px 16px",borderBottom:"1px solid #1a1a24",background:"#0e0e16"}}>
+            <div style={{fontSize:12,color:"#aaa",fontStyle:"italic",borderLeft:`3px solid ${col}`,paddingLeft:10,marginBottom:8}}>"{phase.analogy}"</div>
+            <div style={{fontSize:12,color:"#bbb",lineHeight:1.75,marginBottom:10}}>{phase.overview}</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:10}}>
+              {phase.keyTargets.map(t=>(
+                <div key={t} style={{fontSize:10,padding:"3px 8px",background:`${col}0e`,border:`1px solid ${col}20`,borderRadius:4,color:"#bbb"}}>{t}</div>
+              ))}
+            </div>
+            {phase.competition&&(
+              <div style={{background:`${col}0e`,border:`1px solid ${col}30`,borderRadius:7,padding:"10px 12px",marginBottom:10}}>
+                <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,color:col,fontWeight:700,letterSpacing:".1em",marginBottom:5}}>🏆 TARGET — WEEK {phase.competition.week}: {phase.competition.name}</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:"3px 14px",marginBottom:6}}>
+                  {phase.competition.targets.map(t=><div key={t} style={{fontFamily:"'JetBrains Mono',monospace",fontSize:11,color:"#d0c0a0"}}>{t}</div>)}
+                </div>
+                {phase.competition.note&&<div style={{fontSize:10,color:"#777"}}>{phase.competition.note}</div>}
+              </div>
+            )}
+            <div style={{background:"#14141e",borderRadius:5,padding:"8px 10px"}}>
+              <span style={{fontSize:9,letterSpacing:".12em",color:"#555"}}>NUTRITION: </span>
+              <span style={{fontSize:11,color:"#999"}}>{phase.nutrition}</span>
+            </div>
+          </div>
+
+          {/* DAY SELECTOR */}
+          <div style={{display:"flex",gap:5,overflowX:"auto",padding:"10px 16px",background:"#0A0A0E",borderBottom:"1px solid #1a1a24"}}>
+            {phase.days.map((d,i)=>(
+              <button key={d.id} onClick={()=>setActiveDay(i)}
+                style={{flexShrink:0,padding:"6px 12px",border:`1px solid ${activeDay===i?col:"#252530"}`,
+                  background:activeDay===i?`${col}15`:"#111116",
+                  color:activeDay===i?col:"#666",borderRadius:5,fontSize:10,
+                  fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,letterSpacing:".05em"}}>
+                DAY {d.id}
+              </button>
+            ))}
+          </div>
+
+          {/* DAY DETAIL */}
+          <div style={{padding:"14px 16px 48px"}}>
+            <div style={{marginBottom:12}}>
+              <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:22,fontWeight:900,color:col,letterSpacing:".04em"}}>{day.label}</div>
+              <div style={{fontSize:11,color:"#888",marginTop:2}}>{day.sub}</div>
+            </div>
+
+            <div style={{overflowX:"auto",borderRadius:8,border:"1px solid #1e1e28"}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:12,minWidth:520}}>
+                <thead>
+                  <tr style={{background:"#13131c",borderBottom:"1px solid #1e1e28"}}>
+                    {["Exercise","Protocol / Weekly Progression","Notes & Coaching Cues"].map(h=>(
+                      <th key={h} style={{textAlign:"left",padding:"8px 10px",fontSize:9,letterSpacing:".12em",color:"#555",fontWeight:700,whiteSpace:"nowrap"}}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {day.exercises.map((ex,i)=>{
+                    const isPrimary = ex.name.includes("★★★");
+                    const isImportant = ex.name.includes("★") || ex.name.includes("[ADDED") || ex.name.includes("[NON-NEG") || ex.name.includes("[MANDATORY");
+                    return (
+                      <tr key={i} style={{borderBottom:"1px solid #16161e",background:i%2===1?"#0d0d16":"transparent"}}>
+                        <td style={{padding:"10px 10px",fontWeight:isPrimary?800:isImportant?700:500,
+                          color:isPrimary?col:isImportant?`${col}BB`:"#D4C8B8",
+                          fontSize:isPrimary?13:12,lineHeight:1.4,verticalAlign:"top",whiteSpace:"nowrap",
+                          borderLeft:isPrimary?`3px solid ${col}`:"3px solid transparent"}}>
+                          {ex.name}
+                        </td>
+                        <td style={{padding:"10px 10px",fontSize:11,fontFamily:"'JetBrains Mono',monospace",color:"#A09878",lineHeight:1.7,verticalAlign:"top",maxWidth:280}}>
+                          {ex.protocol}
+                        </td>
+                        <td style={{padding:"10px 10px",fontSize:11,color:"#706050",lineHeight:1.7,verticalAlign:"top",maxWidth:240}}>
+                          {ex.note}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* HYROX Station Reference */}
+            {activeDay===5 && activePhase===2 && (
+              <div style={{marginTop:14,background:"#0e1812",border:"1px solid #20884A30",borderRadius:8,padding:"12px 14px"}}>
+                <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,letterSpacing:".15em",color:"#20884A",marginBottom:8,fontWeight:700}}>HYROX COURSE REFERENCE (Full Race)</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:"4px 20px"}}>
+                  {["1km Run → 1000m SkiErg","1km Run → 50m Sled Push (152kg men)","1km Run → 50m Sled Pull (103kg men)","1km Run → 80m Burpee Broad Jumps","1km Run → 1000m Row","1km Run → 200m Farmer's Carry (24kg each)","1km Run → 100m Sandbag Lunges (20kg)","1km Run → 100 Wall Balls (6kg/9ft)"].map((s,i)=>(
+                    <div key={i} style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:"#7a9a7a"}}>Station {i+1}: {s}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
