@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sanctum — Phase III | 20-Week Hybrid Program</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; background: #0A0A0E; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+const dayColors = {LIFT:"#E8920A",RUN:"#20884A","LIFT+RUN":"#2a82c4","LIFT+HYROX":"#D03515",REST:"#3a3a44"};
+
+const mesocycles = [
+  {
+    id:1, name:"MESOCYCLE I", label:"Foundation & Density", weeks:"Weeks 1–4", col:"#E8920A",
+    analogy:"First four posts of a new fence line — set the corners right, everything else follows.",
+    focus:"Hypertrophy base · Aerobic foundation · HYROX station intro",
+    dupPattern:["Wk1: Hypertrophy 8–12 reps @70–75%","Wk2: Str-Hyp 6–8 reps @75–80%","Wk3: Strength 4–6 reps @80–85%","Wk4: DELOAD @60–65%"],
+    goals:["Rebuild work capacity post-powerlifting meet","Establish 3-run/week aerobic base","HYROX station technique introduction","Maintain strength, begin hypertrophy shift"],
+    loading:{
+      deadlift:[
+        {wk:1,scheme:"5@75% / 3@82%",backoff:"3×5 @67%",note:"Re-establish groove. Not a PR session."},
+        {wk:2,scheme:"5@77% / 3@84%",backoff:"2×4 @70%",note:"RPE 8 on the 3RM set."},
+        {wk:3,scheme:"5@79% / 3@86%",backoff:"2×3 @73% + 1 heavy @89%",note:"Heavy single = confidence check, not a max."},
+        {wk:4,scheme:"DELOAD: 3×5 @63%",backoff:"—",note:"Full reset. Every rep crisp."},
+      ],
+      frontSquat:[
+        {wk:1,scheme:"3@70% / 2@76% / 1@82%",backoff:"2×3 @68%",note:"Post-meet feel-out. Wrist warm-up mandatory."},
+        {wk:2,scheme:"3@72% / 2@78% / 1@84%",backoff:"Heavy attempt if groove is clean",note:""},
+        {wk:3,scheme:"3@74% / 2@80% / 1@86%",backoff:"Max effort single attempt",note:"First real ceiling test post-meet."},
+        {wk:4,scheme:"DELOAD: 3×3 @65%",backoff:"—",note:""},
+      ],
+      backSquat:[
+        {wk:1,scheme:"5@72% / 3@80% / 1@87%",backoff:"3×5 @68%",note:""},
+        {wk:2,scheme:"5@74% / 3@82% / 1@89%",backoff:"2×4 @70%",note:""},
+        {wk:3,scheme:"5@76% / 3@84% / 1@91%",backoff:"Max single attempt",note:""},
+        {wk:4,scheme:"DELOAD: 3×5 @67%",backoff:"—",note:""},
+      ],
+      bench:[
+        {wk:1,scheme:"3×10 @70%",backoff:"—",note:"Hypertrophy emphasis this MC."},
+        {wk:2,scheme:"3×8 @74%",backoff:"—",note:""},
+        {wk:3,scheme:"4×6 @78%",backoff:"—",note:""},
+        {wk:4,scheme:"DELOAD: 3×10 @65%",backoff:"—",note:""},
+      ],
+    },
+    running:{
+      easy:"30–35 min | Zone 2 | HR 130–145 | Nasal breathing only. Irrigation — widening the aerobic pipe, not flooding it.",
+      tempo:"4×6 min @threshold (~5k pace +30sec/km) | 2 min jog recovery | ~35 min total. Uncomfortable but controlled.",
+      track:"8×400m @5k pace | 90 sec rest between | ~25 min total. Same pace every rep — not faster at the start.",
+    },
+    conditioning:{
+      label:"CrossFit-Style Density Circuits",
+      desc:"Building work capacity before HYROX-specific loading. Pouring the concrete slab before framing the walls.",
+      sessions:[
+        "Wk1: 4 rounds | 15 Wall Balls (20lb) + 25 cal Assault Bike + 50m Farmer's Carry (24kg/hand) | 2 min rest | ~30 min",
+        "Wk2: 4 rounds | 500m Row + 15 Burpee Broad Jumps + 50m Backwards Sled Walk (moderate load) | 90 sec rest | ~35 min",
+        "Wk3: 5 rounds | 200m Run + 12 Wall Balls + 10 Burpees + 200m Row | 90 sec rest | ~35 min",
+        "Wk4: DELOAD | 3 easy rounds: 300m Row + 10 Wall Balls + 25 cal Bike | No time pressure | 60% effort",
+      ],
+    },
+  },
+  {
+    id:2, name:"MESOCYCLE II", label:"Strength-Hypertrophy", weeks:"Weeks 5–8", col:"#2a82c4",
+    analogy:"Stringing the wire — posts are set, now run the fence line with intention.",
+    focus:"Strength-hypertrophy bridge · Running extension · HYROX station combos with running",
+    dupPattern:["Wk5: Str-Hyp 6–8 reps @75–82%","Wk6: Strength 4–5 reps @80–85%","Wk7: Intensity 3–4 reps @85–90%","Wk8: DELOAD"],
+    goals:["Primary lifts building toward new post-meet PRs","Running: 40 min easy / 2×15 min tempo / 6×600m track","HYROX station combos with 1km running integration","Body comp: lean-out beginning naturally from conditioning volume"],
+    loading:{
+      deadlift:[
+        {wk:5,scheme:"5@79% / 3@85%",backoff:"3×4 @72%",note:""},
+        {wk:6,scheme:"5@81% / 3@87%",backoff:"2×3 @74%",note:""},
+        {wk:7,scheme:"4@83% / 3@88%",backoff:"2×2 @78% + 1@90%",note:"First true heavy single of the cycle."},
+        {wk:8,scheme:"DELOAD: 3×3 @68%",backoff:"—",note:""},
+      ],
+      frontSquat:[
+        {wk:5,scheme:"3@74% / 2@80% / 1@86%",backoff:"Max if groove is sharp",note:""},
+        {wk:6,scheme:"3@76% / 2@82% / 1@88%",backoff:"Max single",note:""},
+        {wk:7,scheme:"3@78% / 2@84% / 1@90%",backoff:"PR attempt",note:"MC2 ceiling test."},
+        {wk:8,scheme:"DELOAD: 3×3 @68%",backoff:"—",note:""},
+      ],
+      backSquat:[
+        {wk:5,scheme:"5@76% / 3@83% / 1@90%",backoff:"",note:""},
+        {wk:6,scheme:"5@78% / 3@85% / 1@91%",backoff:"",note:""},
+        {wk:7,scheme:"5@80% / 3@87% / 1@92%+",backoff:"",note:""},
+        {wk:8,scheme:"DELOAD: 3×5 @70%",backoff:"—",note:""},
+      ],
+      bench:[
+        {wk:5,scheme:"5@75% / 3@82% / 1@88%",backoff:"2×6 @72%",note:"Strength phase begins."},
+        {wk:6,scheme:"5@77% / 3@84% / 1@89%",backoff:"",note:""},
+        {wk:7,scheme:"4@80% / 2@87% / 1@91%",backoff:"",note:""},
+        {wk:8,scheme:"DELOAD: 3×8 @68%",backoff:"—",note:""},
+      ],
+    },
+    running:{
+      easy:"40 min | Zone 2 | HR 130–145 | +5 min from MC1. Consistent aerobic stimulus.",
+      tempo:"2×15 min @threshold | 3 min jog between | ~40 min total. Sustained threshold — where real aerobic development happens.",
+      track:"6×600m @5k pace | 2 min rest | ~30 min total. Slight distance increase from MC1.",
+    },
+    conditioning:{
+      label:"HYROX Station Combos + Conditioning",
+      desc:"Real HYROX movements integrated with running. Technique first, intensity second. Learning to work cattle before running them through the chute.",
+      sessions:[
+        "Wk5: 5 rounds | 500m Row + 50m Sled Push (70kg) + 200m Run | 2 min rest | ~35 min",
+        "Wk6: 4 rounds | 1km Run + 1000m Ski Erg + 15 Wall Balls | 2 min rest | ~40 min",
+        "Wk7: 3 rounds | 1km Run + 50m Sled Push + 1km Run + 50m Sled Pull | 3 min rest | ~40 min",
+        "Wk8: DELOAD | 3 easy mixed rounds. 60% effort. HR never above 155.",
+      ],
+    },
+  },
+  {
+    id:3, name:"MESOCYCLE III", label:"Strength Peak", weeks:"Weeks 9–12", col:"#D03515",
+    analogy:"Cattle drive to the railhead — everything you've built is moving in one direction now.",
+    focus:"Strength ceiling · HYROX half-simulations · Running race-pace introduction",
+    dupPattern:["Wk9: Strength 3–5 reps @82–88%","Wk10: Intensity 2–4 reps @86–92%","Wk11: PEAK 1–3 reps @90%+","Wk12: DELOAD"],
+    goals:["New post-meet PRs on all primary lifts","HYROX half-simulations (4 stations + 4km run)","Tempo approaching 30 min continuous at threshold","Body recomp: strength base supporting visible leanness"],
+    loading:{
+      deadlift:[
+        {wk:9,scheme:"5@82% / 2@89%",backoff:"2×2 @80% + 1 heavy @92%",note:""},
+        {wk:10,scheme:"4@84% / 2@90%",backoff:"Single @93%",note:""},
+        {wk:11,scheme:"3@85% / 1@91%",backoff:"3-attempt competition simulation",note:"Opener / Second / Max — run it like a meet."},
+        {wk:12,scheme:"DELOAD: 3×3 @70%",backoff:"—",note:""},
+      ],
+      frontSquat:[
+        {wk:9,scheme:"3@79% / 2@85% / 1@91%",backoff:"Max attempt",note:""},
+        {wk:10,scheme:"3@81% / 2@87% / 1@93%",backoff:"Max single",note:""},
+        {wk:11,scheme:"2@83% / 2@89% / 1@95%+",backoff:"PR attempt",note:"MC3 peak."},
+        {wk:12,scheme:"DELOAD: 3×3 @68%",backoff:"—",note:""},
+      ],
+      backSquat:[
+        {wk:9,scheme:"5@82% / 3@88% / 1@93%",backoff:"",note:""},
+        {wk:10,scheme:"4@83% / 2@90% / 1@94%",backoff:"",note:""},
+        {wk:11,scheme:"3@85% / 2@91% / 1 MAX+",backoff:"",note:""},
+        {wk:12,scheme:"DELOAD: 3×5 @72%",backoff:"—",note:""},
+      ],
+      bench:[
+        {wk:9,scheme:"5@80% / 3@87% / 1@92%",backoff:"2×4 @78%",note:""},
+        {wk:10,scheme:"4@82% / 2@89% / 1@93%",backoff:"",note:""},
+        {wk:11,scheme:"3@84% / 1@91% / 1 MAX",backoff:"",note:""},
+        {wk:12,scheme:"DELOAD: 3×8 @70%",backoff:"—",note:""},
+      ],
+    },
+    running:{
+      easy:"45 min | Zone 2 | HR 130–145 | Steady. Your recovery anchor from heavy strength work.",
+      tempo:"4×10 min @threshold | Wk11: 1×30 min continuous | 2 min jog | True lactate threshold development.",
+      track:"5×800m @5k pace | 2.5 min rest | Wk11: 3×1200m | Building speed endurance.",
+    },
+    conditioning:{
+      label:"HYROX Half-Simulations",
+      desc:"4-station segments with full 1km runs between. Real race feel at controlled effort. Find your weak stations now — not on race day.",
+      sessions:[
+        "Wk9: Half A | 1km Run + 1000m Row + 1km Run + 50m Sled Push + 1km Run + 50m Sled Pull + 1km Run + 80m Burpee Broad Jumps | Target sub-45 min",
+        "Wk10: Half B | 1km Run + Ski Erg + 1km Run + Farmer's Carry + 1km Run + Sandbag Lunges + 1km Run + 50 Wall Balls | Log every station split",
+        "Wk11: Weak station focus | 6 targeted rounds on your 2 slowest stations + 1km runs between | Fix the leak",
+        "Wk12: DELOAD | 3 easy rounds mixed. 60% effort.",
+      ],
+    },
+  },
+  {
+    id:4, name:"MESOCYCLE IV", label:"Power + Conditioning", weeks:"Weeks 13–16", col:"#20884A",
+    analogy:"Breaking in the horse — the cattle work starts for real. Speed, endurance, efficiency.",
+    focus:"Transition: strength → HYROX conditioning · Running race-pace peak · Speed development",
+    dupPattern:["Wk13: Power 2–3 reps + speed work","Wk14: Str-Power 3–4 reps @80%+","Wk15: Conditioning peak / str maintenance","Wk16: DELOAD"],
+    goals:["Full HYROX simulations beginning","Running at near race-pace on tempo and track","Conditioning volume at highest point in program","Body comp: natural lean-out from conditioning peak"],
+    loading:{
+      deadlift:[
+        {wk:13,scheme:"5@78% + 3×3 speed pulls @60% EMOM",backoff:"1@85%",note:"Speed pulls: :20 on/:40 off. Explosive every rep. Fast is a skill."},
+        {wk:14,scheme:"5@80% + 3×2 speed @63%",backoff:"1@87%",note:""},
+        {wk:15,scheme:"3@83% + 3×2 speed @65%",backoff:"1@88%",note:"Last heavy DL before conditioning volume peaks."},
+        {wk:16,scheme:"DELOAD: 3×5 @68%",backoff:"—",note:""},
+      ],
+      frontSquat:[
+        {wk:13,scheme:"4×4 @76% — maintenance",backoff:"",note:"Technique focus. Not peaking."},
+        {wk:14,scheme:"4×4 @78%",backoff:"",note:""},
+        {wk:15,scheme:"4×3 @80%",backoff:"",note:""},
+        {wk:16,scheme:"DELOAD: 3×3 @65%",backoff:"—",note:""},
+      ],
+      backSquat:[
+        {wk:13,scheme:"5@78% / 3@84% / 1@89% + 3×2 speed @60%",backoff:"",note:""},
+        {wk:14,scheme:"5@80% / 3@85% / 1@90%",backoff:"",note:""},
+        {wk:15,scheme:"3×5 @78% — maintenance",backoff:"",note:"Conditioning is the priority now."},
+        {wk:16,scheme:"DELOAD: 3×5 @68%",backoff:"—",note:""},
+      ],
+      bench:[
+        {wk:13,scheme:"3×10 @72% — hypertrophy",backoff:"",note:"Shift back to volume for body comp."},
+        {wk:14,scheme:"3×10 @74%",backoff:"",note:""},
+        {wk:15,scheme:"4×8 @75%",backoff:"",note:""},
+        {wk:16,scheme:"DELOAD: 3×12 @65%",backoff:"—",note:""},
+      ],
+    },
+    running:{
+      easy:"45–50 min | Zone 2 | HR 128–142 | Volume builds, intensity stays controlled.",
+      tempo:"3×12 min @threshold | Wk15: 2×20 min continuous | Race-pace development.",
+      track:"6×600m @race pace | Wk15: 8×400m faster than race pace | Sharpening tools.",
+    },
+    conditioning:{
+      label:"Full HYROX Simulations",
+      desc:"Complete 8-station race simulations at controlled effort. Time awareness and pacing — not suffering. Running the full fence line to find the weak spots.",
+      sessions:[
+        "Wk13: Full HYROX sim @75% effort | Track every station split | Don't race — assess",
+        "Wk14: Full HYROX sim @80% effort | Use Wk13 splits to adjust pacing strategy per station",
+        "Wk15: Full HYROX @85% + 2× targeted station intervals (your weakest 2) after | Best total time attempt",
+        "Wk16: DELOAD | Partial sim (4 stations + 4km run) at 60% effort",
+      ],
+    },
+  },
+  {
+    id:5, name:"MESOCYCLE V", label:"Mock HYROX + Body Comp", weeks:"Weeks 17–20", col:"#7050D0",
+    analogy:"Moving day — the ranch house is built. Now you show what's inside.",
+    focus:"Mock HYROX timed attempt · Body composition polish · Strength maintenance",
+    dupPattern:["Wk17: Peak conditioning + str maintenance","Wk18: Full mock HYROX attempt","Wk19: Taper + body comp focus","Wk20: MOCK HYROX EVENT"],
+    goals:["Timed mock HYROX — establish personal baseline","Body composition: visible lean-out from sustained conditioning","Strength: maintained at 85–90% of peak","Debrief every station split and plan the next cycle"],
+    loading:{
+      deadlift:[
+        {wk:17,scheme:"3×5 @77% — maintenance",backoff:"",note:"Maintenance only. No PRs this week."},
+        {wk:18,scheme:"3×5 @75%",backoff:"",note:"Mock event week — conserve."},
+        {wk:19,scheme:"2×5 @73% — taper",backoff:"",note:""},
+        {wk:20,scheme:"MOCK EVENT WEEK — light movement only",backoff:"—",note:""},
+      ],
+      frontSquat:[
+        {wk:17,scheme:"3×4 @77% — maintenance",backoff:"",note:""},
+        {wk:18,scheme:"3×3 @75%",backoff:"",note:""},
+        {wk:19,scheme:"2×3 @73% — taper",backoff:"",note:""},
+        {wk:20,scheme:"Skip or 2×3 @65% shakeout",backoff:"—",note:""},
+      ],
+      backSquat:[
+        {wk:17,scheme:"3×5 @79% — maintenance",backoff:"",note:""},
+        {wk:18,scheme:"3×5 @77%",backoff:"",note:""},
+        {wk:19,scheme:"2×5 @74% — taper",backoff:"",note:""},
+        {wk:20,scheme:"MOCK EVENT WEEK — skip",backoff:"—",note:""},
+      ],
+      bench:[
+        {wk:17,scheme:"4×10 @72% — body comp",backoff:"",note:"Higher rep, pump focus."},
+        {wk:18,scheme:"3×12 @70%",backoff:"",note:""},
+        {wk:19,scheme:"3×12 @68% — taper",backoff:"",note:""},
+        {wk:20,scheme:"Light pump work only",backoff:"—",note:""},
+      ],
+    },
+    running:{
+      easy:"40 min | Wk19–20: 30 min | Zone 2 | Taper the volume, not the consistency.",
+      tempo:"Wk17: 2×15 min | Wk18: 1×20 min | Wk19: 1×15 min easy | Wk20: 20 min shakeout only",
+      track:"Wk17: 6×400m @race pace | Wk18: 4×400m sharpener | Wk19–20: 4×200m strides only",
+    },
+    conditioning:{
+      label:"Mock HYROX + Taper",
+      desc:"Two shots at the clock, then taper into body comp maintenance. This is what 20 weeks built toward.",
+      sessions:[
+        "Wk17: Final HYROX full sim @90%+ | Best time attempt | Log every station split in detail",
+        "Wk18: MOCK HYROX — Full timed attempt | Race it. This is the event.",
+        "Wk19: Body comp conditioning | 3 rounds: 20 min Bike + 10 min Row + 15 min incline walk | Caloric deficit week",
+        "Wk20: Rest and reflect | Light movement only | Debrief all 8 station splits and plan next cycle",
+      ],
+    },
+  },
+];
+
+const days = [
+  {
+    id:0, weekday:"MON", label:"Day 2 — Posterior", sub:"Posterior Chain + Shoulders + Tris",
+    type:"LIFT", dayNote:"Primary: Deadlift (DUP per mesocycle). Hip thrusts removed — replaced with GHD series + backwards sled.",
+    exercises:[
+      {name:"CONVENTIONAL DEADLIFT ★★★",protocol:"→ Mesocycle loading table",note:"PRIMARY. Brace, then lat tension before leaving the floor. Each mesocycle advances the ceiling."},
+      {name:"GHD Hamstring Curl / Nordic Curl",protocol:"3×8–10 | 3–4 sec eccentric",note:"Replaces hip thrust. Posterior chain at hip AND knee. Nordics build the deceleration strength your running demands — ignore this and your hamstrings will tell you on mile 4."},
+      {name:"Feet Elevated Ring Row",protocol:"3×Max | add load when >15 reps",note:"Full scapular retraction at top. Dead hang at bottom."},
+      {name:"DB Shoulder Press",protocol:"4×10 | Arnold or standard | seated back-supported",note:""},
+      {name:"T-Bar Row",protocol:"4×10 | alternate wide/narrow grip each week",note:"Mid-back thickness. Chest stays on pad."},
+      {name:"Laterals",protocol:"4×15 | cable or DB | light and controlled",note:"No momentum."},
+      {name:"Tricep Pushdown",protocol:"4×Max | rope or straight bar",note:"Full extension. Elbows pinned."},
+      {name:"Farmer's Carry",protocol:"3×100ft | 24–32kg/hand — builds across program",note:"Grip, core, traps. Walk with intent."},
+      {name:"Backwards Sled Walk",protocol:"3×50m | moderate load",note:"VMO + glute activation without spinal compression. Direct HYROX sled pull transfer."},
+      {name:"Abs",protocol:"3×20 | GHD sit-ups → weighted → L-sit progression",note:"GHD sit-ups are the primary core movement. Earn the range before adding load."},
+    ],
+  },
+  {
+    id:1, weekday:"TUE", label:"Easy Run", sub:"Zone 2 Aerobic Development",
+    type:"RUN", dayNote:"See mesocycle running table. Nasal breathing ONLY. This is never a workout — it's irrigation.",
+    exercises:[
+      {name:"Zone 2 Run",protocol:"→ Mesocycle running table | HR 130–145",note:"Hold a full conversation. If you can't, back off. This is where the aerobic engine gets built, not in the fast sessions."},
+      {name:"Post-Run Mobility",protocol:"10 min | hip flexor + calf + hamstring",note:"Non-negotiable. Your hip flexors take dual stress from squatting and running this program."},
+    ],
+  },
+  {
+    id:2, weekday:"WED", label:"Day 1 + Tempo Run", sub:"Full Body AM | Threshold Run PM",
+    type:"LIFT+RUN", dayNote:"AM: Full body lift. PM (4–6 hrs later): Tempo run. If energy is low, substitute easy 30 min — don't grind a tempo on empty.",
+    exercises:[
+      {name:"BULGARIAN SPLIT SQUAT ★★",protocol:"8RM work-up | 3 sets at 8RM | +5lbs when all 3 are clean",note:"PRIMARY unilateral driver. Barbell or SSB. Heavier than you think — own the 8RM, then add load."},
+      {name:"Barbell Strict Press",protocol:"5×5 + 1 max set @80% of top set",note:"Second strict press day of the week. Elbows slightly in front, no leg drive. This is how you build overhead that lasts."},
+      {name:"DB Incline Bench",protocol:"3×10–12 | full stretch at bottom",note:""},
+      {name:"SA DB Row",protocol:"3×10–12/arm | straps allowed",note:"Full lat stretch. Pull elbow to hip."},
+      {name:"Calves",protocol:"3×15–20 | leg press or standing | full stretch at bottom",note:"Running punishes neglected calves — consider this insurance."},
+      {name:"Chin-Ups",protocol:"3×AMRAP | add weight when >12 reps",note:""},
+      {name:"Walking Lunges",protocol:"3×100ft | DBs or sandbag",note:"Direct HYROX sandbag lunge transfer. Loaded and deliberate."},
+      {name:"— PM: TEMPO RUN —",protocol:"→ Mesocycle running table",note:"4–6 hrs after lifting. Substitute easy 30 min if fatigued."},
+    ],
+  },
+  {
+    id:3, weekday:"THU", label:"Day 3 — Quads/Hams", sub:"Front Squat + GHR + Chest/Back",
+    type:"LIFT", dayNote:"Front Squat is still a primary goal lift. GHR is non-negotiable every session.",
+    exercises:[
+      {name:"FRONT SQUAT ★★★",protocol:"3-2-1-Max | → Mesocycle loading table",note:"PRIMARY GOAL LIFT. Wrist warm-up mandatory. Film every heavy single. This lift doesn't get easier — you get better."},
+      {name:"Weighted Pull-Up / Lat Pulldown AHAP",protocol:"5RM pull-up OR heavy lat pulldown | 3–4 sets",note:"Add weight to pull-up when 5RM is achieved. Full dead hang at top."},
+      {name:"GHR (Glute-Ham Raise)",protocol:"3×10 | progress load when controlled",note:"Best hamstring movement in the gym. Eccentric is the work — don't rush it."},
+      {name:"Weighted Push-Ups / Dips",protocol:"3×Max | vest or plate | alternate weekly",note:""},
+      {name:"Seated DB Laterals + Standing Laterals",protocol:"3×12–15 each",note:""},
+      {name:"Bayesian Rear Delt Fly",protocol:"3×12 | cable, single arm",note:"Full stretch. Rear delt health for all the pressing volume in this program."},
+      {name:"Back Extension",protocol:"3×20 | BW → weighted | full ROM",note:"Lumbar endurance. Take this seriously — your lower back is under sustained load."},
+      {name:"Leg Extension",protocol:"3×20 | slow eccentric | peak squeeze",note:""},
+    ],
+  },
+  {
+    id:4, weekday:"FRI", label:"Track Intervals", sub:"Speed + Lactate Clearance",
+    type:"RUN", dayNote:"See mesocycle running table. Sharpest session of the week. Come in rested — this day earns Saturday.",
+    exercises:[
+      {name:"Track Intervals",protocol:"→ Mesocycle running table",note:"Controlled aggression — same pace every rep, not sprint-then-die. Like driving cattle in a straight line: purposeful and even."},
+      {name:"Post-Interval Cool Down",protocol:"10 min easy jog + 10 min mobility",note:"Don't skip. Lactate clearance matters for Saturday's double session."},
+    ],
+  },
+  {
+    id:5, weekday:"SAT", label:"Day 4 + HYROX", sub:"Back Squat + Chest + Arms AM | HYROX Conditioning PM",
+    type:"LIFT+HYROX", dayNote:"Biggest day of the week. AM: Lift hard. PM (3–4 hrs later): Conditioning block. Fuel between sessions — this is non-negotiable.",
+    exercises:[
+      {name:"BACK SQUAT ★★★",protocol:"5-3-1-Max | → Mesocycle loading table",note:"PRIMARY. Low-bar. Belt for work sets. Commands if training with a partner — mental rehearsal for competition."},
+      {name:"Bench Press",protocol:"→ Mesocycle loading table | varies by MC",note:"Hypertrophy in MC1 · Strength in MC2–3 · Volume in MC4–5. Scheme shifts to serve the current goal."},
+      {name:"Barbell Row",protocol:"4×10 | 185–215 building across program | alternate grip weekly",note:"Explosive pull. This is not a slow grind."},
+      {name:"Reverse Lunges",protocol:"4×12/leg | barbell or DB",note:""},
+      {name:"Filly Press",protocol:"3×10/side | banded or cable",note:"Shoulder stability. Single arm — own the position."},
+      {name:"Side Lying Laterals",protocol:"3×10 | slow and deliberate",note:""},
+      {name:"CBUM Arms Block A",protocol:"3–4 rounds: Preacher Curl → Rope French Press → Decline Skull Crusher",note:""},
+      {name:"CBUM Arms Block B",protocol:"3–4 rounds: Reverse Preacher → Incline DB Curl → Rope Pushdown",note:"Arm volume. This is the dessert — earn it with the rest of the session."},
+      {name:"— PM: HYROX CONDITIONING —",protocol:"→ Mesocycle conditioning block",note:"3–4 hrs after lifting. Fueled. CrossFit density meets HYROX endurance."},
+    ],
+  },
+  {
+    id:6, weekday:"SUN", label:"Rest", sub:"Full Recovery — Mandatory",
+    type:"REST", dayNote:"You ran 3x and lifted 4x this week. Sunday earns you Monday.",
+    exercises:[
+      {name:"Full Rest",protocol:"No structured training",note:"Walk, foam roll, sleep. The work is done."},
+      {name:"Optional",protocol:"20 min walk + mobility | nothing more",note:"Nothing that elevates heart rate significantly."},
+    ],
+  },
+];
+
+function App() {
+  const [activeMC, setActiveMC] = useState(0);
+  const [activeDay, setActiveDay] = useState(0);
+  const [liftView, setLiftView] = useState("deadlift");
+
+  const mc = mesocycles[activeMC];
+  const day = days[activeDay];
+  const col = mc.col;
+  const dCol = dayColors[day.type] || "#555";
+
+  return (
+    <div style={{fontFamily:"'Barlow',system-ui,sans-serif",background:"#0A0A0E",minHeight:"100vh",color:"#E0D8CC"}}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');*{box-sizing:border-box;}::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}button{cursor:pointer;transition:all .15s;}`}</style>
+
+      {/* HEADER */}
+      <div style={{padding:"16px",borderBottom:"1px solid #1e1e2a",background:"#0A0A0E"}}>
+        <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:26,fontWeight:900,letterSpacing:".07em",color:"#20884A",lineHeight:1}}>SANCTUM — PHASE III</div>
+        <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,letterSpacing:".2em",color:"#444",marginTop:2}}>20-WEEK · STRENGTH + HYROX + RUNNING HYBRID</div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:"5px 18px",marginTop:8}}>
+          {[["Structure","4 Lift + 3 Run + HYROX/wk"],["Event","Mock HYROX — Week 20"],["Periodization","Undulating (DUP) across 5 mesocycles"],["Goal","Strong · Lean · Mobile · Capable"]].map(([k,v])=>(
+            <div key={k} style={{fontSize:10}}><span style={{color:"#444"}}>{k}: </span><span style={{color:"#20884A",fontFamily:"'JetBrains Mono',monospace"}}>{v}</span></div>
+          ))}
+        </div>
+      </div>
+
+      {/* WEEKLY SCHEDULE STRIP */}
+      <div style={{padding:"10px 16px 10px",borderBottom:"1px solid #1a1a24",background:"#0e0e14"}}>
+        <div style={{fontSize:9,letterSpacing:".18em",color:"#3a3a44",marginBottom:6,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700}}>WEEKLY TEMPLATE</div>
+        <div style={{display:"flex",gap:5,overflowX:"auto",paddingBottom:2}}>
+          {days.map((d,i)=>{
+            const dc = dayColors[d.type]||"#444";
+            return (
+              <button key={i} onClick={()=>setActiveDay(i)} style={{flexShrink:0,background:i===activeDay?`${dc}18`:"#0f0f16",border:`1px solid ${i===activeDay?dc:"#1e1e28"}`,borderRadius:6,padding:"7px 10px",textAlign:"left",minWidth:78}}>
+                <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:8,color:dc,letterSpacing:".08em"}}>{d.weekday}</div>
+                <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:700,color:i===activeDay?"#E0D8CC":"#555",marginTop:2,lineHeight:1.2}}>{d.label}</div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* MESOCYCLE TABS */}
+      <div style={{display:"flex",overflowX:"auto",borderBottom:"1px solid #1a1a24",background:"#0e0e14"}}>
+        {mesocycles.map((m,i)=>(
+          <button key={i} onClick={()=>setActiveMC(i)} style={{flexShrink:0,padding:"10px 14px",border:"none",borderBottom:`2px solid ${activeMC===i?m.col:"transparent"}`,background:activeMC===i?`${m.col}10`:"transparent",color:activeMC===i?m.col:"#555",textAlign:"left"}}>
+            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:9,letterSpacing:".1em",fontWeight:700}}>{m.name}</div>
+            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:12,fontWeight:700,color:activeMC===i?"#E0D8CC":"#444",marginTop:1}}>{m.label}</div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:9,color:"#3a3a44",marginTop:1}}>{m.weeks}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* MC OVERVIEW */}
+      <div style={{padding:"12px 16px",borderBottom:"1px solid #1a1a24",background:"#0e0e16"}}>
+        <div style={{fontSize:11,color:"#999",fontStyle:"italic",borderLeft:`3px solid ${col}`,paddingLeft:10,marginBottom:8}}>"{mc.analogy}"</div>
+        <div style={{fontSize:11,color:"#777",marginBottom:8}}>{mc.focus}</div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:8}}>
+          {mc.goals.map(g=>(
+            <div key={g} style={{fontSize:10,padding:"3px 8px",background:`${col}0d`,border:`1px solid ${col}1e`,borderRadius:4,color:"#aaa"}}>{g}</div>
+          ))}
+        </div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+          {mc.dupPattern.map((d,i)=>(
+            <div key={i} style={{fontSize:9,padding:"3px 8px",background:"#111116",border:"1px solid #1e1e28",borderRadius:4,color:"#555",fontFamily:"'JetBrains Mono',monospace"}}>{d}</div>
+          ))}
+        </div>
+      </div>
+
+      {/* LOADING TABLE */}
+      <div style={{padding:"12px 16px",borderBottom:"1px solid #1a1a24"}}>
+        <div style={{fontSize:9,letterSpacing:".18em",color:"#444",marginBottom:8,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700}}>PRIMARY LIFT LOADING — {mc.name}</div>
+        <div style={{display:"flex",gap:4,marginBottom:8,flexWrap:"wrap"}}>
+          {[["deadlift","DEADLIFT"],["frontSquat","FRONT SQ"],["backSquat","BACK SQ"],["bench","BENCH"]].map(([k,lbl])=>(
+            <button key={k} onClick={()=>setLiftView(k)} style={{padding:"4px 10px",border:`1px solid ${liftView===k?col:"#252530"}`,background:liftView===k?`${col}14`:"#111116",color:liftView===k?col:"#555",borderRadius:4,fontSize:10,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,letterSpacing:".05em"}}>{lbl}</button>
+          ))}
+        </div>
+        <div style={{overflowX:"auto",borderRadius:6,border:"1px solid #1e1e28"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",minWidth:380}}>
+            <thead>
+              <tr style={{background:"#13131c",borderBottom:"1px solid #1e1e28"}}>
+                {["Week","Loading Scheme","Backoff / Accessories","Note"].map(h=>(
+                  <th key={h} style={{textAlign:"left",padding:"7px 10px",fontSize:9,letterSpacing:".1em",color:"#444",fontWeight:700,whiteSpace:"nowrap"}}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {mc.loading[liftView].map((row,i)=>(
+                <tr key={i} style={{borderBottom:"1px solid #16161e",background:i%2===1?"#0d0d16":"transparent"}}>
+                  <td style={{padding:"8px 10px",fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:col,whiteSpace:"nowrap",fontWeight:700}}>Wk {row.wk}</td>
+                  <td style={{padding:"8px 10px",fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:"#A09878",lineHeight:1.6,maxWidth:180}}>{row.scheme}</td>
+                  <td style={{padding:"8px 10px",fontSize:10,color:"#706050",lineHeight:1.6,maxWidth:150}}>{row.backoff||"—"}</td>
+                  <td style={{padding:"8px 10px",fontSize:10,color:"#504030",lineHeight:1.6,maxWidth:160}}>{row.note||""}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* RUNNING */}
+      <div style={{padding:"12px 16px",borderBottom:"1px solid #1a1a24",background:"#0e0e14"}}>
+        <div style={{fontSize:9,letterSpacing:".18em",color:"#444",marginBottom:8,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700}}>RUNNING PRESCRIPTION — {mc.name}</div>
+        <div style={{display:"flex",flexDirection:"column",gap:5}}>
+          {[["🟢 EASY — Tuesday",mc.running.easy,"#20884A"],["🔵 TEMPO — Wednesday PM",mc.running.tempo,"#2a82c4"],["🔴 TRACK — Friday",mc.running.track,"#D03515"]].map(([label,text,c])=>(
+            <div key={label} style={{background:"#111116",border:`1px solid ${c}20`,borderLeft:`3px solid ${c}`,borderRadius:6,padding:"8px 12px"}}>
+              <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:700,color:c,letterSpacing:".06em",marginBottom:4}}>{label}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:"#A09878",lineHeight:1.7}}>{text}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CONDITIONING */}
+      <div style={{padding:"12px 16px",borderBottom:"1px solid #1a1a24"}}>
+        <div style={{background:`${col}08`,border:`1px solid ${col}22`,borderRadius:8,padding:"12px 14px"}}>
+          <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:10,fontWeight:700,color:col,letterSpacing:".12em",marginBottom:6}}>⚡ SAT PM — {mc.conditioning.label}</div>
+          <div style={{fontSize:11,color:"#777",marginBottom:10,lineHeight:1.7,fontStyle:"italic"}}>{mc.conditioning.desc}</div>
+          {mc.conditioning.sessions.map((s,i)=>(
+            <div key={i} style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,color:"#A09878",marginBottom:6,lineHeight:1.7,paddingLeft:10,borderLeft:`2px solid ${col}35`}}>{s}</div>
+          ))}
+        </div>
+      </div>
+
+      {/* DAY EXERCISES */}
+      <div style={{padding:"14px 16px 52px"}}>
+        <div style={{marginBottom:12}}>
+          <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:22,fontWeight:900,color:dCol,letterSpacing:".04em"}}>{day.label}</div>
+          <div style={{fontSize:11,color:"#777",marginTop:2}}>{day.sub}</div>
+          {day.dayNote&&<div style={{fontSize:10,color:"#4a4a54",marginTop:6,fontStyle:"italic",paddingLeft:8,borderLeft:`2px solid ${dCol}35`,lineHeight:1.6}}>{day.dayNote}</div>}
+        </div>
+        <div style={{overflowX:"auto",borderRadius:8,border:"1px solid #1e1e28"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",minWidth:480}}>
+            <thead>
+              <tr style={{background:"#13131c",borderBottom:"1px solid #1e1e28"}}>
+                {["Exercise","Protocol","Notes & Cues"].map(h=>(
+                  <th key={h} style={{textAlign:"left",padding:"8px 10px",fontSize:9,letterSpacing:".12em",color:"#444",fontWeight:700}}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {day.exercises.map((ex,i)=>{
+                const isPrimary=ex.name.includes("★★★");
+                const isKey=ex.name.includes("★")||ex.name.startsWith("—");
+                return(
+                  <tr key={i} style={{borderBottom:"1px solid #16161e",background:i%2===1?"#0d0d16":"transparent"}}>
+                    <td style={{padding:"10px 10px",fontWeight:isPrimary?800:isKey?700:500,color:isPrimary?dCol:isKey?`${dCol}99`:"#D4C8B8",fontSize:isPrimary?13:12,lineHeight:1.4,verticalAlign:"top",whiteSpace:"nowrap",borderLeft:isPrimary?`3px solid ${dCol}`:"3px solid transparent"}}>{ex.name}</td>
+                    <td style={{padding:"10px 10px",fontSize:10,fontFamily:"'JetBrains Mono',monospace",color:"#A09878",lineHeight:1.7,verticalAlign:"top",maxWidth:240}}>{ex.protocol}</td>
+                    <td style={{padding:"10px 10px",fontSize:10,color:"#686050",lineHeight:1.7,verticalAlign:"top",maxWidth:220}}>{ex.note}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
